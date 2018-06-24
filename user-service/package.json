@@ -1,0 +1,16 @@
+{
+  "name": "user-service",
+  "version": "0.0.1",
+  "description": "Microservice for authenticating users",
+  "main": "app.js",
+  "dependencies": {
+    "hapi": "^17.5.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "app" : "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "W.K.S",
+  "license": "ISC"
+}
