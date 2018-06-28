@@ -1,4 +1,7 @@
+require('./config/config.js')
+require('./db/')
 const Hapi = require('hapi')
+const RegistrationController = require('./account/controllers/registrationController.js')
 
 const server = Hapi.server({
 	address: 'localhost',
@@ -12,6 +15,8 @@ server.route({
         return 'Hello, world!';
     }
 });
+
+server.route(RegistrationController.createUser)
 
 process.on('unhandledRejection', (err) => {
     console.log(err);
