@@ -12,10 +12,10 @@ class RegistrationController{
 		try{
 			return await UserService.createUser(body);
 		}catch(e){
+			debugger;
 			console.log(e)
 			let status = 500;
 			let resp;
-			debugger;
 			if (e instanceof ValidationError) {
 				resp = new ErrorResponse(domains.account.registration.validation,undefined,e.fields)
 				status = 400;

@@ -40,3 +40,9 @@ GET /users/me (authenticated)
 13030. --- account with email has not been verified
 13040. --- account with email is blocked
 13999. --- Undocumented Login error
+
+3. Todo
+
+- Unit Test
+- Localize
+[-] Helpful password error mesaage

@@ -1,11 +1,12 @@
+//TODO: Refactor
 const _ = require('lodash');
 const validator = require('validator');
 const {MongoError} = require('mongodb');
-const passwordTest = require('owasp-password-strength-test');
+const owasp = require('owasp-password-strength-test');
 
 const {User, Token} = require('./../models');
 const {mongoose} = require('./../../db');
-const {ValidationError, DuplicateAccountError} = require('./error.js');
+const {ValidationError, DuplicateAccountError, WeakPasswordError} = require('./error.js');
 
 const mongoDuplicateKeyErrorCode = 11000;
 
@@ -40,12 +41,6 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 		minlength: 6,
-		validate:{
-			validator: (v)=>{
-				return passwordTest.test(v).strong
-			},
-			message: '{VALUE} is not a strong password. It should include a lowercase, uppercase and a special character'
-		}
 	},
 	firstName:{
 		type: String,
@@ -79,29 +74,43 @@ const UserSchema = new mongoose.Schema({
 })
 
 const UserDao = mongoose.model('User',UserSchema)
+
 UserSchema.statics.save = async (obj) => {
 	try{
+		validatePassword(obj.password)
+
 		const userDao = new UserDao(obj)
 		const savedUserDao = await userDao.save()
 		return daoToModel(savedUserDao)
 	}catch(e){
+		debugger;
 		if(e.name === "MongoError" && e.code == mongoDuplicateKeyErrorCode){
 			throw new DuplicateAccountError(e)
-		}else{
+		}else if(e.name === "ValidationError"){
 			const fields = _.mapValues(e.errors,(value)=>value.message)
-			throw new ValidationError(fields,e)
+			throw new ValidationError(fields)
+		}else if(e instanceof WeakPasswordError){
+			throw new ValidationError({'password':e.message})
 		}
 	}
 }
 
 UserSchema.statics.update = async(obj) =>{
-	console.log(`Update user with id: ${JSON.stringify(obj,undefined,2)}`)
 	const updatedUserDao = await UserDao.findOneAndUpdate({_id: obj.id},{$set:obj},{new: true})
 	return daoToModel(updatedUserDao)
 }
 
+const validatePassword = function(password){
+	if(!password) return;
+
+	const passwordStrength = owasp.test(password);
+	if(!passwordStrength.strong){
+		const message = _.join(passwordStrength.errors,'\n');
+		throw new WeakPasswordError(message);
+	}
+}
+
 const daoToModel = (dao) => {
-	//TODO: Refactor
 	return new User(
 		id = dao._id.toHexString(), 
 		email = dao.email, 
