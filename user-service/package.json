@@ -4,6 +4,7 @@
   "description": "Microservice for authenticating users",
   "main": "app.js",
   "dependencies": {
+    "bcrypt": "2.0.1",
     "hapi": "17.5.2",
     "joi": "13.4.0",
     "jsonwebtoken": "8.3.0",

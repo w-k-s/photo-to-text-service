@@ -1,8 +1,8 @@
 1. Routes
 
 POST /users
-- create temp users given email, password, first name, last name, 
-- email must be unique (http 400, domain account, code 1102)
+[-] create temp users given email, password, first name, last name, 
+[-] email must be unique (http 400, domain account, code 1102)
 - sends confirmation email
 - verification code is jwt which expires in one week
 - if email is valid, create user with first name, last name, email, password, isActive, createDate, lastLogin, isStaff, permissions, groups
@@ -45,4 +45,5 @@ GET /users/me (authenticated)
 
 - Unit Test
 - Localize
+[-] Encrypt password
 [-] Helpful password error mesaage

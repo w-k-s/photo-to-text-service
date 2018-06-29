@@ -9,7 +9,7 @@ const jwtSignature = process.env.JWT_SECRET;
 const jwtExpirySeconds = process.env.JWT_EXP_SECONDS;
 
 const createUser = async (user) => {
-	let savedUser = await UserRepository.save(user);
+	let savedUser = await UserRepository.create(user);
 	const token = generateToken(savedUser.id);
 	savedUser.tokens.push(token);
 	return await UserRepository.update(savedUser);

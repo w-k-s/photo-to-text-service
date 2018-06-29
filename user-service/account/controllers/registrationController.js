@@ -23,7 +23,7 @@ class RegistrationController{
 				resp = new ErrorResponse(domains.account.registration.duplicateAccount)
 				status = 400;
 			}else{
-				resp = new ErrorResponse(domains.account.registration.undocumented)
+				resp = new ErrorResponse(domains.account.registration.undocumented, e.message)
 				status = 500;
 			}
 

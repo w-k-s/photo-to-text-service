@@ -2,12 +2,14 @@
 const _ = require('lodash');
 const validator = require('validator');
 const {MongoError} = require('mongodb');
+const bcrypt = require('bcrypt')
 const owasp = require('owasp-password-strength-test');
 
 const {User, Token} = require('./../models');
 const {mongoose} = require('./../../db');
 const {ValidationError, DuplicateAccountError, WeakPasswordError} = require('./error.js');
 
+const saltRounds = parseInt(process.env.SALT_ROUNDS);
 const mongoDuplicateKeyErrorCode = 11000;
 
 const TokenSchema = new mongoose.Schema({
@@ -75,10 +77,11 @@ const UserSchema = new mongoose.Schema({
 
 const UserDao = mongoose.model('User',UserSchema)
 
-UserSchema.statics.save = async (obj) => {
+UserSchema.statics.create = async (obj) => {
 	try{
 		validatePassword(obj.password)
 
+		obj.password = await encryptPassword(obj.password)
 		const userDao = new UserDao(obj)
 		const savedUserDao = await userDao.save()
 		return daoToModel(savedUserDao)
@@ -91,6 +94,8 @@ UserSchema.statics.save = async (obj) => {
 			throw new ValidationError(fields)
 		}else if(e instanceof WeakPasswordError){
 			throw new ValidationError({'password':e.message})
+		}else{
+			throw e;
 		}
 	}
 }
@@ -110,6 +115,24 @@ const validatePassword = function(password){
 	}
 }
 
+const encryptPassword = (password) => {
+	return new Promise((resolve,reject)=>{
+		bcrypt.genSalt(saltRounds, (err,salt)=>{
+			if(err){
+				reject(err);
+				return;
+			}
+			bcrypt.hash(password,salt,(err,hash)=>{
+				if(err){
+					reject(err);
+					return;
+				}
+				resolve(hash);
+			})
+		})
+	})
+}
+
 const daoToModel = (dao) => {
 	return new User(
 		id = dao._id.toHexString(), 
@@ -126,6 +149,6 @@ const daoToModel = (dao) => {
 }
 
 module.exports = {
-	save: UserSchema.statics.save,
+	create: UserSchema.statics.create,
 	update: UserSchema.statics.update
 }
