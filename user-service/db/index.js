@@ -1,18 +1,34 @@
-// const {MongoClient, MongoError} = require('mongodb');
+const mongodb = require('mongodb').MongoClient;
 
-// class Db {
-//   async constructor(){
-//    if(! Db.instance){
-//      this.client = await mongodb.connect(process.env.MONGODB_URI);
-//      Db.instance = this;
-//    }
+let _db;
+let _client;
 
-//    return Db.instance;
-//   }
-// }
+module.exports = {
+    initDb,
+    getDb,
+    getClient,
+    closeDb
+};
 
-// const instance = new Db();
-// Object.freeze(instance);
+async function initDb() {
+	console.log(`Connecting to mongodb\n`);
+    _client = await mongodb.connect(process.env.MONGODB_URI,{ useNewUrlParser: true });
+    _db = _client.db(process.env.MONGODB_NAME); 
+	console.log(`Connected to mongodb: ${_client.isConnected()}`);
+}
 
-// export default instance;
+function getDb() {
+    return _db;
+}
 
+function getClient() {
+    return _client;
+}
+
+function closeDb(){
+	if(_client){
+		console.log(`Closing client`);
+		_client.close();
+		console.log(`Connected to mongodb: ${_client.isConnected()}`);
+	}
+}

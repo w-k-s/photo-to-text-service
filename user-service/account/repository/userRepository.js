@@ -1,5 +1,4 @@
-//TODO: Refactor
-const {MongoClient, MongoError} = require('mongodb');
+const {initDb,getDb,getClient} = require('./../../db');
 
 const {User, Token} = require('./../models');
 const {DuplicateAccountError} = require('./error.js');
@@ -9,13 +8,9 @@ const mongoDuplicateKeyErrorCode = 11000;
 
 class UserRepository{
 
-	constructor(){
-		this.db = null;
-		MongoClient.connect(process.env.MONGODB_URI, (err, client) => {
-            if (err) console.error(error)
-            else console.log("Connected successfully to server");
-            this.db = client.db(process.env.MONGODB_NAME);
-        });
+	constructor(db){
+		console.log('UserRepository.constructor');
+		this.db = db;
 	}
 
 	async saveUser(user){
@@ -45,4 +40,4 @@ class UserRepository{
 	}
 }
 
-module.exports = new UserRepository();
+module.exports = new UserRepository(getDb());

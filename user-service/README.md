@@ -45,10 +45,7 @@ GET /users/me (authenticated)
 
 [-] Encrypt password
 [-] Helpful password error mesaage
-- Single db instance
-- Close db
-- db should save object with _id field
-- _id should be set on user object
-- model validate should return instanceof model
+[-] Single db instance
+[-] Close db
 - Unit Test
 - Localize
