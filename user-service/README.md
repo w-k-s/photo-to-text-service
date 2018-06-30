@@ -43,7 +43,12 @@ GET /users/me (authenticated)
 
 3. Todo
 
-- Unit Test
-- Localize
 [-] Encrypt password
 [-] Helpful password error mesaage
+- Single db instance
+- Close db
+- db should save object with _id field
+- _id should be set on user object
+- model validate should return instanceof model
+- Unit Test
+- Localize
