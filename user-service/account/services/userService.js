@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 const owasp = require('owasp-password-strength-test');
 
 const {User, Token} = require('./../models');
-const {WeakPasswordError} = require('./../repository/error.js');
+const {WeakPasswordError} = require('./../errors');
 const userRepository = require('./../repository/userRepository.js');
 
 const saltRounds = parseInt(process.env.SALT_ROUNDS);

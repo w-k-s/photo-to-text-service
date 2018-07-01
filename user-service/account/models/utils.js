@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const {ValidationError} = require('./../repository/error.js');
+const {ValidationError} = require('./../errors');
 
 const validateJoiResult = function(result){
 	if(result && result.error){

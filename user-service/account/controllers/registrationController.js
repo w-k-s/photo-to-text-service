@@ -1,16 +1,15 @@
 const Joi = require('joi')
 const _ = require('lodash')
 
-const UserService = require('./../services/userService.js');
-const {ValidationError, DuplicateAccountError} = require('./../repository/error.js');
-const {ErrorResponse,domains} = require('./error.js');
+const userService = require('./../services/userService.js');
+const {ErrorResponse, domains, ValidationError, DuplicateAccountError} = require('./../errors');
 
 class RegistrationController{
 
 	static async createUser(req,h){
 		const body =  _.pick(req.payload, ['email','password','firstName','lastName']);
 		try{
-			return await UserService.createUser(body);
+			return await userService.createUser (body);
 		}catch(e){
 			debugger;
 			console.log(e)

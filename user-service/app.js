@@ -1,7 +1,9 @@
 require('./config/config.js')
-const {initDb, getDb, getClient, closeDb} = require('./db/');
 const Hapi = require('hapi');
 
+const {initDb, getDb, getClient, closeDb} = require('./db/');
+const RegistrationController = require('./account/controllers/registrationController.js');
+    
 const server = Hapi.server({
 	address: 'localhost',
 	port: 3000
@@ -12,8 +14,7 @@ function exitHandler(options, err) {
         console.log(err.stack);
     }
     if (options.cleanup){
-        console.log('Cleaning');
-        console.log('-  Closing db');
+        console.log('Cleaning...');
         closeDb();
     }
     if (options.exit){
@@ -36,13 +37,11 @@ server.route({
     }
 });
 
+server.route(RegistrationController.createUser)
+
 const init = async () => {
     await initDb();
     await server.start();
-    
-    const RegistrationController = require('./account/controllers/registrationController.js');
-    
-    server.route(RegistrationController.createUser)
     
     console.log(`Server running at: ${server.info.uri}`);
 }

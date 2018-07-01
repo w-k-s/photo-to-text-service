@@ -1,14 +1,3 @@
-class ErrorResponse{
-
-	constructor(domain, message = domain.message, userInfo){
-		this.code = domain.code;
-		this.path = domain.path;
-		this.message = message;
-		this.userInfo = userInfo;
-	}
-
-}
-
 const domains = {
 	account: {
 		code: 10000,
@@ -65,7 +54,4 @@ const domains = {
 	}
 }
 
-module.exports = {
-	ErrorResponse,
-	domains
-}
+module.exports = domains;
