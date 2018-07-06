@@ -11,7 +11,7 @@ module.exports = {
 };
 
 async function initDb() {
-	console.log(`Connecting to mongodb\n`);
+	console.log(`Connecting to ${process.env.MONGODB_URI} ${process.env.MONGODB_NAME}\n`);
     _client = await mongodb.connect(process.env.MONGODB_URI,{ useNewUrlParser: true });
     _db = _client.db(process.env.MONGODB_NAME); 
 	console.log(`Connected to mongodb: ${_client.isConnected()}`);

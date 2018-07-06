@@ -19,9 +19,13 @@ const domains = {
 		},
 		verification:{
 			code: 12000,
-			tokenExpired:{
+			tokenNotFound:{
 				code: 12010,
-				path: 'account.verification.tokenExpired'
+				path: 'account.verification.tokenNotFound'
+			},
+			tokenNotValid:{
+				code: 12020,
+				path: 'account.verification.tokenNotValid'
 			},
 			undocumented:{
 				code: 12999,
@@ -34,9 +38,9 @@ const domains = {
 				code: 13010,
 				path: 'account.login.invalidCredentials'
 			},
-			noSuchAccount:{
+			accountNotFound:{
 				code: 13020,
-				path: 'account.login.noSuchAccount'
+				path: 'account.login.accountNotFound'
 			},
 			accountUnverified:{
 				code: 13030,

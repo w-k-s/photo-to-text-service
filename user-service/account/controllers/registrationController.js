@@ -1,34 +1,88 @@
 const Joi = require('joi')
 const _ = require('lodash')
 
-const userService = require('./../services/userService.js');
-const {ErrorResponse, domains, ValidationError, DuplicateAccountError} = require('./../errors');
+const {userService,emailService} = require('./../services');
+const {contentTypeJson} = require('./validation.js')
+const {ErrorResponse, 
+	domains, 
+	ValidationError, 
+	DuplicateAccountError, 
+	TokenNotFoundError,
+	InvalidTokenError
+} = require('./../errors');
 
 class RegistrationController{
 
 	static async createUser(req,h){
 		const body =  _.pick(req.payload, ['email','password','firstName','lastName']);
 		try{
-			return await userService.createUser (body);
+			const user = await userService.createUser (body);
+			await RegistrationController.sendVerificationEmail(req,user);
+			
+			return h.response(_.omit(user,['password','tokens']))
+					.code(201)
 		}catch(e){
-			debugger;
 			console.log(e)
 			let status = 500;
-			let resp;
+			let resp = new ErrorResponse(domains.account.registration.undocumented, e.message);
+			
 			if (e instanceof ValidationError) {
 				resp = new ErrorResponse(domains.account.registration.validation,undefined,e.fields)
 				status = 400;
 			}else if(e instanceof DuplicateAccountError){
 				resp = new ErrorResponse(domains.account.registration.duplicateAccount)
 				status = 400;
-			}else{
-				resp = new ErrorResponse(domains.account.registration.undocumented, e.message)
-				status = 500;
 			}
 
 			return h.response(resp)
 					.code(status);
 		}
+	}
+
+	static async verifyAccount(req, h, err){
+		try{
+			const verificationToken = req.params.token;
+			const user = await userService.verifyUser(verificationToken);
+			return _.omit(user,['password','tokens']);
+		}catch(e){
+			console.log(e)
+			let status = 500;
+			let resp = new ErrorResponse(domains.account.registration.undocumented, e.message)
+			
+			if (e instanceof TokenNotFoundError) {
+				resp = new ErrorResponse(domains.account.verification.tokenNotFound,e.message)
+				status = 404;
+			}else if(e instanceof InvalidTokenError){
+				resp = new ErrorResponse(domains.account.verification.tokenNotValid,e.message)
+				status = 400;
+			}
+
+			return h.response(resp)
+					.code(status);
+		}
+	}
+
+	static async sendVerificationEmail(req,user){
+		
+		const verifyEmailToken = user.getVerifyEmailToken().token;
+		const verifyEmailLink = RegistrationController.verificationUrl(req,verifyEmailToken);
+		
+		//TODO: use message queue, and use template
+		const message = `<p><a href="${verifyEmailLink}">Verify</a> your email<p>`;
+		console.log(message);
+		await emailService.sendEmail({
+			to: user.email,
+			subject: 'Verify your account',
+			html: message
+		});
+	}
+
+	static verificationUrl(req,verifyEmailToken){
+		const scheme = 'http';
+		const host = req.info.host;
+		const path = `/users/verify/${verifyEmailToken}`;
+
+		return `${scheme}://${host}${path}`;
 	}
 }
 
@@ -39,10 +93,13 @@ module.exports = {
 		handler: RegistrationController.createUser,
 		options:{
 			validate:{
-				headers: Joi.object({
-				    'content-type': Joi.string().valid('application/json').required(),
-				}).options({allowUnknown: true})
+				headers: contentTypeJson
 			}
 		}
+	},
+	verifyAccount: {
+		method: 'GET',
+		path: '/users/verify/{token}',
+		handler: RegistrationController.verifyAccount
 	}
 }

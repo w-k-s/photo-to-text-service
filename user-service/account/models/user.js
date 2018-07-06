@@ -12,8 +12,8 @@ const userSchema = Joi.object().keys({
 	lastName: Joi.string().regex(/^[A-Z]*[a-z]*/).min(1).required(),
 	isActive: Joi.boolean().default(false).required(),
 	isStaff: Joi.boolean().default(false).required(),
-	createDate: Joi.date().default(Date.now()),
-	lastLogin: Joi.date(),
+	createDate: Joi.date().timestamp('unix').default(Date.now()/1000),
+	lastLogin: Joi.date().timestamp('unix').optional().allow(null),
 	tokens: Joi.array().default([])
 });
 
@@ -30,6 +30,10 @@ class User{
 		this.createDate = createDate;
 		this.lastLogin = lastLogin;
 		this.tokens = tokens
+	}
+
+	getVerifyEmailToken(){
+		return this.tokens.filter((token)=>token.access === "verify")[0];
 	}
 
 	static validate(obj){

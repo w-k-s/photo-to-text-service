@@ -2,7 +2,8 @@ require('./config/config.js')
 const Hapi = require('hapi');
 
 const {initDb, getDb, getClient, closeDb} = require('./db/');
-const RegistrationController = require('./account/controllers/registrationController.js');
+const {RegistrationController} = require('./account/controllers');
+const {emailService} = require('./account/services');
     
 const server = Hapi.server({
 	address: 'localhost',
@@ -33,14 +34,18 @@ server.route({
     method: 'GET',
     path: '/',
     handler: (request, h) => {
-        return 'Hello, world!';
+        debugger;
+        return `Hello, world! ${request.url.urlString}`;
     }
 });
 
+
 server.route(RegistrationController.createUser)
+server.route(RegistrationController.verifyAccount);
 
 const init = async () => {
     await initDb();
+    await emailService.initEmailService();
     await server.start();
     
     console.log(`Server running at: ${server.info.uri}`);

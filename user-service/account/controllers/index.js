@@ -1,0 +1,1 @@
+module.exports.RegistrationController = require('./registrationController.js');
