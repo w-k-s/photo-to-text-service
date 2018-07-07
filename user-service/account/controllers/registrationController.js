@@ -17,7 +17,7 @@ class RegistrationController{
 		const body =  _.pick(req.payload, ['email','password','firstName','lastName']);
 		try{
 			const user = await userService.createUser (body);
-			await RegistrationController.sendVerificationEmail(req,user);
+			RegistrationController.sendVerificationEmail(req,user);
 			
 			return h.response(_.omit(user,['password','tokens']))
 					.code(201)

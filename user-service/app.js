@@ -35,7 +35,7 @@ server.route({
     path: '/',
     handler: (request, h) => {
         debugger;
-        return `Hello, world! ${request.url.urlString}`;
+        return `User API`;
     }
 });
 

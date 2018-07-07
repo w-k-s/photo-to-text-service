@@ -5,6 +5,7 @@ const {ObjectId} = require('mongodb');
 
 require('./../../config/config.js')
 const {initDb,getDb} = require('./../../db');
+const {User} = require('./../models');
 const {DuplicateAccountError} = require('./../errors');
 const userRepository = require('./userRepository.js');
 const usersCollection = 'users';
@@ -15,19 +16,36 @@ describe('userRepository',()=>{
 		await initDb();
 	});
 
+	let user;
+
 	beforeEach(async ()=>{
 		await getDb().collection(usersCollection).remove({})
+		user = new User({
+			firstName: 'Joe',
+			lastName: 'Blogs',
+			email: 'test@gmail.com',
+			password:'123',
+			isActive: false, 
+			isStaff: false, 
+			createDate: new Date(), 
+			tokens: [
+				{
+					access:'auth',
+					token: '213112323',
+					expiry: new Date()
+				},
+				{
+					access:'verify',
+					token: '2332e21e2',
+					expiry: new Date()
+				}
+		]});
+
+		const res = await userRepository.saveUser(user);
+		user._id = res.toHexString();
 	});
 
 	describe('saveUser',()=>{
-
-		let user;
-
-		beforeEach(async () => {
-			user = {firstName: 'Joe',lastName: 'Blogs',email: 'test@gmail.com'};
-			const res = await userRepository.saveUser(user);
-			user._id = res.toHexString();
-		});
 
 		it('should save user',async ()=>{
 			const doc = await getDb().collection(usersCollection).findOne({email: user.email})
@@ -47,14 +65,6 @@ describe('userRepository',()=>{
 	});
 
 	describe('updateUser', ()=>{
-
-		let user;
-
-		beforeEach(async () => {
-			user = {firstName: 'Joe',lastName: 'Blogs',email: 'test@gmail.com'};
-			const res = await userRepository.saveUser(user);
-			user._id = res.toHexString();
-		});
 
 		it('should update user', async () => {
 			user.firstName = 'Jack';
@@ -102,32 +112,9 @@ describe('userRepository',()=>{
 
 	describe('userWithVerificationToken',()=>{
 
-		let user;
-		let userId;
-
-		beforeEach(async ()=>{
-			user = {
-				firstName: 'Joe', 
-				lastName: 'Blogs', 
-				email: 'test@gmail.com',
-				tokens: [
-					{
-						access:'auth',
-						token: '213112323'
-					},
-					{
-						access:'verify',
-						token: '2332e21e2'
-					}
-			]};
-
-			const id = await userRepository.saveUser(user);
-			userId = id.toHexString();
-		});
-
 		it('should return user with matching verify token', async () => {
 			const doc = await userRepository.userWithVerificationToken(user.tokens[1].token);
-			expect(doc._id.toHexString()).toEqual(userId);
+			expect(doc._id.toHexString()).toEqual(user._id);
 		});
 
 		it('should return null for matching auth token', async () => {
@@ -138,6 +125,19 @@ describe('userRepository',()=>{
 		it('should return null for no matching token', async () => {
 			const doc = await userRepository.userWithVerificationToken('3241311232113131213');
 			expect(doc).toBeFalsy();
+		});
+	});
+
+	describe('removeVerificationToken',()=>{
+
+		it('should remove verify token with matching token value', async () => {
+			const result = await userRepository.removeVerificationToken(user.tokens[1].token);
+			expect(result).toBeTruthy();
+		});
+
+		it('should not remove auth token with matching token value', async () => {
+			const result = await userRepository.removeVerificationToken(user.tokens[0].token);
+			expect(result).toBeFalsy();
 		});
 	});
 })

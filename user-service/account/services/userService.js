@@ -20,8 +20,9 @@ const createUser = async function(obj){
 
 	obj.isActive = false;
 	obj.isStaff = false;
+	obj.createDate = new Date();
 	
-	let user = await User.validate(obj);
+	let user = new User(obj);
 	user._id = await userRepository.saveUser(user);
 	user.tokens.push(generateAuthToken(user._id));
 	user.tokens.push(generateVerificationToken(user.email))
@@ -93,7 +94,7 @@ const verifyUser = async (verificationToken) => {
 	}catch(e){
 		throw new InvalidTokenError(e);
 	}finally{
-		//TODO: remove verification token in both cases (valid / invalid)
+		await userRepository.removeVerificationToken(verificationToken);
 	}
 
 	user.isActive = true;

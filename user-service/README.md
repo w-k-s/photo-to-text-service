@@ -49,3 +49,7 @@ GET /users/me (authenticated)
 [-] Close db
 - Unit Test
 - Localize
+
+4. References
+
+[How to use arguments and parameters in ecmascript](https://www.smashingmagazine.com/2016/07/how-to-use-arguments-and-parameters-in-ecmascript-6/)

@@ -22,6 +22,7 @@ const getUsersCollection = () => {
 }
 
 const insertUser = async (user)=>{
+	assert(user instanceof User);
 	const obj = {...user};
 	try{
 		const res = await getUsersCollection().insert(obj)
@@ -35,8 +36,8 @@ const insertUser = async (user)=>{
 }
 
 const updateUser = async (user) => {
-	assert(user._id);
-	assert(user.email);
+	assert(user instanceof User);
+	assert(user._id); 
 
 	let obj = {...user};
 	obj = _.omit(obj,'_id');
@@ -61,8 +62,21 @@ const userWithVerificationToken = async (verificationToken) => {
 	});
 }
 
+const removeVerificationToken = async (verificationToken) => {
+	const res =  await getUsersCollection().remove({
+		'tokens':{$elemMatch: {
+			'access':'verify',
+			'token':verificationToken
+		}}
+	});
+	debugger;
+	console.log(`token: ${verificationToken}. res: ${JSON.stringify(res.result.n)}`);
+	return res.result.n > 0;
+}
+
 module.exports = {
 	saveUser,
 	updateUser,
-	userWithVerificationToken
+	userWithVerificationToken,
+	removeVerificationToken
 };
