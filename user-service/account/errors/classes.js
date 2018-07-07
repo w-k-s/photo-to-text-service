@@ -1,51 +1,34 @@
-class ValidationError extends Error{
-	constructor(fields,message){
+class BaseError extends Error{
+	constructor(message){
 		super(message);
 		this.name = this.constructor.name;
 		this.message = message;
 		this.stack = (new Error(message)).stack;
+	}
+}
+
+class ValidationError extends BaseError{
+	constructor(fields,message){
+		super(message);
 		this.fields = fields;
 	}
 }
 
-class DuplicateAccountError extends Error{
-	constructor(...args){
-		super(...args);
-		this.name = this.constructor.name;
-		this.stack = (new Error()).stack;
-	}
-}
+class DuplicateAccountError extends BaseError{}
 
-class WeakPasswordError extends Error{
-	constructor(message){
-		super(message);
-		this.name = this.constructor.name;
-		this.message = message;
-		this.stack = (new Error(message)).stack;
-	}
-}
+class WeakPasswordError extends BaseError{}
 
-class TokenNotFoundError extends Error{
-	constructor(message){
-		super(message);
-		this.name = this.constructor.name;
-		this.message = message;
-		this.stack = (new Error(message)).stack;
-	}
-}
+class TokenNotFoundError extends BaseError{}
 
-class InvalidTokenError extends Error{
-	constructor(...args){
-		super(...args);
-		this.name = this.constructor.name;
-		this.stack = (new Error()).stack;
-	}
-}
+class InvalidTokenError extends BaseError{}
+
+class AccountNotFoundError extends BaseError{}
 
 module.exports = {
 	ValidationError,
 	DuplicateAccountError,
 	WeakPasswordError, 
 	TokenNotFoundError,
-	InvalidTokenError
+	InvalidTokenError,
+	AccountNotFoundError
 }

@@ -53,6 +53,14 @@ const indexUsers = async ()=>{
 	await getUsersCollection().createIndex( { 'email': 1 }, { unique: true });
 }
 
+const findUserWithEmail = async (email) =>{
+	assert(email);
+
+	return await getUsersCollection().findOne({
+		'email': email,
+	})
+}
+
 const userWithVerificationToken = async (verificationToken) => {
 	return await getUsersCollection().findOne({
 		'tokens':{$elemMatch: {
@@ -78,5 +86,6 @@ module.exports = {
 	saveUser,
 	updateUser,
 	userWithVerificationToken,
-	removeVerificationToken
+	removeVerificationToken,
+	findUserWithEmail
 };

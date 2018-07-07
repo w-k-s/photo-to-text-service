@@ -3,10 +3,16 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
 const owasp = require('owasp-password-strength-test');
+const assert = require('assert').strict;
 
 const {User, Token} = require('./../models');
-const {WeakPasswordError, InvalidTokenError, TokenNotFoundError} = require('./../errors');
 const {userRepository} = require('./../repository');
+const {
+	WeakPasswordError, 
+	InvalidTokenError, 
+	TokenNotFoundError,
+	AccountNotFoundError
+} = require('./../errors');
 
 const saltRounds = parseInt(process.env.SALT_ROUNDS);
 const jwtSignature = process.env.JWT_SECRET;
@@ -15,7 +21,7 @@ const verifyEmailExpirySeconds = parseInt(process.env.EMAIL_VERIFICATION_EXP_SEC
 
 const createUser = async function(obj){
 	
-	validatePassword(obj.password);
+	checkPasswordStrength(obj.password);
 	obj.password = await encryptPassword(obj.password);
 
 	obj.isActive = false;
@@ -26,7 +32,7 @@ const createUser = async function(obj){
 	user._id = await userRepository.saveUser(user);
 	user.tokens.push(generateAuthToken(user._id));
 	user.tokens.push(generateVerificationToken(user.email))
-	userRepository.updateUser(user);
+	await userRepository.updateUser(user);
 	return user;
 }
 
@@ -52,7 +58,21 @@ const generateVerificationToken = (email) => {
 	return new Token({access: 'verify',token,expiry: expiryDate.getTime()/1000})
 }
 
-const validatePassword = function(password){
+const resendVerificationCode = async (email) => {
+	assert(email);
+
+	const user = await userRepository.findUserWithEmail(email);
+	if(!user){
+		throw new AccountNotFoundError(email);
+	}
+
+	await userRepository.removeVerificationToken(user.getVerifyEmailToken());
+	user.tokens.push(generateVerificationToken(user.email))
+	await userRepository.updateUser(user);
+	return user;
+}
+
+const checkPasswordStrength = function(password){
 	if(!password) return;
 
 	const passwordStrength = owasp.test(password);
