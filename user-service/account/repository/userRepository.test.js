@@ -73,7 +73,7 @@ describe('userRepository',()=>{
 			const updatedUser = await userRepository.updateUser(user);
 			const doc = await getDb().collection(usersCollection).findOne({_id: ObjectId(user._id)});
 
-			expect(user._id.toString()).toEqual(doc._id.toHexString());
+			expect(doc._id.toHexString()).toEqual(updatedUser._id);
 			expect(doc.firstName).toEqual(user.firstName);
 			expect(doc.token).toEqual(user.token);
 		});
@@ -114,7 +114,7 @@ describe('userRepository',()=>{
 
 		it('should return user with matching verify token', async () => {
 			const doc = await userRepository.userWithVerificationToken(user.tokens[1].token);
-			expect(doc._id.toHexString()).toEqual(user._id);
+			expect(doc._id).toEqual(user._id);
 		});
 
 		it('should return null for matching auth token', async () => {
@@ -127,20 +127,7 @@ describe('userRepository',()=>{
 			expect(doc).toBeFalsy();
 		});
 	});
-
-	describe('removeVerificationToken',()=>{
-
-		it('should remove verify token with matching token value', async () => {
-			const result = await userRepository.removeVerificationToken(user.tokens[1].token);
-			expect(result).toBeTruthy();
-		});
-
-		it('should not remove auth token with matching token value', async () => {
-			const result = await userRepository.removeVerificationToken(user.tokens[0].token);
-			expect(result).toBeFalsy();
-		});
-	});
-
+	
 	describe('findUserWithEmail',()=>{
 
 		it('should find user with email',async ()=>{
@@ -152,7 +139,6 @@ describe('userRepository',()=>{
 		it('should return null if user with email not found',async ()=>{
 			const result = await userRepository.findUserWithEmail('abc');
 			expect(result).toBeFalsy();
-			expect(result.email).toEqual(user.email);
 		});
 	});
 })

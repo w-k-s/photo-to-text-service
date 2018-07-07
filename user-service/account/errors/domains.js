@@ -1,6 +1,10 @@
 const domains = {
 	account: {
 		code: 10000,
+		accountNotFound:{
+			code: 10010,
+			path: 'account.accountNotFound'
+		},
 		registration: {
 			code: 11000,
 			validation: {
@@ -37,10 +41,6 @@ const domains = {
 			invalidCredentials:{
 				code: 13010,
 				path: 'account.login.invalidCredentials'
-			},
-			accountNotFound:{
-				code: 13020,
-				path: 'account.login.accountNotFound'
 			},
 			accountUnverified:{
 				code: 13030,

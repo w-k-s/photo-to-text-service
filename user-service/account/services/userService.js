@@ -58,18 +58,16 @@ const generateVerificationToken = (email) => {
 	return new Token({access: 'verify',token,expiry: expiryDate.getTime()/1000})
 }
 
-const resendVerificationCode = async (email) => {
+const recreateVerificationCode = async (email) => {
 	assert(email);
 
-	const user = await userRepository.findUserWithEmail(email);
+	let user = await userRepository.findUserWithEmail(email);
 	if(!user){
 		throw new AccountNotFoundError(email);
 	}
-
-	await userRepository.removeVerificationToken(user.getVerifyEmailToken());
-	user.tokens.push(generateVerificationToken(user.email))
-	await userRepository.updateUser(user);
-	return user;
+	user.tokens = user.tokens.filter((token)=> token.access !== 'verify');
+	user.tokens.push(generateVerificationToken(user.email));
+	return await userRepository.updateUser(user);
 }
 
 const checkPasswordStrength = function(password){
@@ -102,12 +100,10 @@ const encryptPassword = (password) => {
 
 const verifyUser = async (verificationToken) => {
 
-	const res = await userRepository.userWithVerificationToken(verificationToken);
-	if(!res){
+	const user = await userRepository.userWithVerificationToken(verificationToken);
+	if(!user){
 		throw new TokenNotFoundError();
 	}
-	res._id = res._id.toHexString();
-	const user = User.validate(res);
 	
 	try{
 		jwt.verify(user.getVerifyEmailToken().token,jwtSignature);
@@ -124,5 +120,6 @@ const verifyUser = async (verificationToken) => {
 
 module.exports = {
 	createUser,
-	verifyUser
+	verifyUser,
+	recreateVerificationCode
 }

@@ -42,6 +42,8 @@ server.route({
 
 server.route(RegistrationController.createUser)
 server.route(RegistrationController.verifyAccount);
+server.route(RegistrationController.resendVerificationCode);
+
 
 const init = async () => {
     await initDb();

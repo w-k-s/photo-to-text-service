@@ -19,10 +19,10 @@ const userSchema = Joi.object().keys({
 
 class User{
 
-	constructor({id, email, password, firstName, lastName, isActive = false, isStaff = false, createDate = Date.now(), lastLogin, tokens = new Array()}){
+	constructor({_id, email, password, firstName, lastName, isActive = false, isStaff = false, createDate = Date.now(), lastLogin, tokens = new Array()}){
 		validateJoiResult(Joi.validate(arguments[0], userSchema));
 
-		this._id = id;
+		this._id = _id;
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;

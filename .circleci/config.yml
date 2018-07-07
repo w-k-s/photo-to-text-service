@@ -6,18 +6,8 @@ version: 2
 jobs: 
   build: 
     docker: 
-      - image: "circleci/node:7.10"
+      - image: "circleci/node:10.5.0"
       - image: "circleci/mongo:3.6.0"
-    working_directory: ~/repo
     steps: 
       - checkout
-      - restore_cache: 
-          keys: 
-            - "v1-dependencies-{{ checksum \"package.json\" }}"
-            - v1-dependencies-
-      - run: "yarn install"
-      - save_cache: 
-          key: "v1-dependencies-{{ checksum \"package.json\" }}"
-          paths: 
-            - node_modules
-      - run: for dir in $(git log --name-only --oneline -1 | sed 1d | grep '/' | cut -d "/" -f1 | sed '/^\.circleci$/d' | sort -u); do cd $dir; npm test; cd ..; done
+      - run: cd user-service; npm install;ls -a ./node_modules; npm test

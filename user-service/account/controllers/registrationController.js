@@ -1,14 +1,15 @@
-const Joi = require('joi')
-const _ = require('lodash')
+const Joi = require('joi');
+const _ = require('lodash');
 
+const {ErrorResponse, UserResponse} = require('./../models');
 const {userService,emailService} = require('./../services');
-const {contentTypeJson} = require('./validation.js')
-const {ErrorResponse, 
-	domains, 
+const {contentTypeJson} = require('./validation.js');
+const {domains, 
 	ValidationError, 
 	DuplicateAccountError, 
 	TokenNotFoundError,
-	InvalidTokenError
+	InvalidTokenError,
+	AccountNotFoundError
 } = require('./../errors');
 
 class RegistrationController{
@@ -16,7 +17,7 @@ class RegistrationController{
 	static async createUser(req,h){
 		const body =  _.pick(req.payload, ['email','password','firstName','lastName']);
 		try{
-			const user = await userService.createUser (body);
+			const user = await userService.createUser(body);
 			RegistrationController.sendVerificationEmail(req,user);
 			
 			return h.response(_.omit(user,['password','tokens']))
@@ -47,7 +48,7 @@ class RegistrationController{
 		}catch(e){
 			console.log(e)
 			let status = 500;
-			let resp = new ErrorResponse(domains.account.registration.undocumented, e.message)
+			let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
 			
 			if (e instanceof TokenNotFoundError) {
 				resp = new ErrorResponse(domains.account.verification.tokenNotFound,e.message)
@@ -55,6 +56,28 @@ class RegistrationController{
 			}else if(e instanceof InvalidTokenError){
 				resp = new ErrorResponse(domains.account.verification.tokenNotValid,e.message)
 				status = 400;
+			}
+
+			return h.response(resp)
+					.code(status);
+		}
+	}
+
+	static async resendVerificationCode(req,h,err){
+		try{
+			const body =  _.pick(req.payload, ['email']);
+			const user = await userService.recreateVerificationCode(body.email);
+			RegistrationController.sendVerificationEmail(req,user);
+			return _.omit(user,['password','tokens']);
+		}catch(e){
+			debugger;
+			console.log(e)
+			let status = 500;
+			let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
+			
+			if (e instanceof AccountNotFoundError) {
+				resp = new ErrorResponse(domains.account.accountNotFound,e.message)
+				status = 404;
 			}
 
 			return h.response(resp)
@@ -101,5 +124,15 @@ module.exports = {
 		method: 'GET',
 		path: '/users/verify/{token}',
 		handler: RegistrationController.verifyAccount
+	},
+	resendVerificationCode: {
+		method: 'POST',
+		path: '/users/resendVerificationCode',
+		handler: RegistrationController.resendVerificationCode,
+		options:{
+			validate:{
+				headers: contentTypeJson
+			}
+		}
 	}
 }
