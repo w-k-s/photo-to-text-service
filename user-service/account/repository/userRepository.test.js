@@ -152,6 +152,7 @@ describe('userRepository',()=>{
 		it('should return null if user with email not found',async ()=>{
 			const result = await userRepository.findUserWithEmail('abc');
 			expect(result).toBeFalsy();
+			expect(result.email).toEqual(user.email);
 		});
 	});
 })

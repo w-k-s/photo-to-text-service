@@ -8,6 +8,7 @@ jobs:
     docker: 
       - image: "circleci/node:7.10"
       - image: "circleci/mongo:3.6.0"
+    working_directory: ~/repo
     steps: 
       - checkout
       - restore_cache: 
@@ -19,6 +20,4 @@ jobs:
           key: "v1-dependencies-{{ checksum \"package.json\" }}"
           paths: 
             - node_modules
-      - run: 
-          command: "npm test"
-          name: Test
+      - run: for dir in $(git log --name-only --oneline -1 | sed 1d | grep '/' | cut -d "/" -f1 | sed '/^\.circleci$/d' | sort -u); do cd $dir; npm test; cd ..; done
