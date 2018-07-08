@@ -8,7 +8,7 @@ const {logObj} = require('./../../utils');
 const {User, Token} = require('./../models');
 const {DuplicateAccountError} = require('./../errors');
 
-const usersCollection = 'users'
+const usersCollection = process.env.MONGODB_NAME;
 const mongoDuplicateKeyErrorCode = 11000;
 
 
@@ -26,8 +26,8 @@ const insertUser = async (user)=>{
 	assert(user instanceof User);
 	const obj = {...user};
 	try{
-		const res = await getUsersCollection().insert(obj)
-		return res.insertedIds[0]
+		const res = await getUsersCollection().insert(obj);
+		return res.insertedIds[0].toString();
 	}catch(err){
 		if(err.code == mongoDuplicateKeyErrorCode){
 			throw new DuplicateAccountError(err)

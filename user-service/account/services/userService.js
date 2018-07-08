@@ -1,13 +1,16 @@
 "use strict"
 
 const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 const bcrypt = require('bcrypt')
 const owasp = require('owasp-password-strength-test');
 const assert = require('assert').strict;
 
+const {logObj} = require('./../../utils');
 const {User, Token} = require('./../models');
 const {userRepository} = require('./../repository');
 const {
+	ValidationError,
 	WeakPasswordError, 
 	InvalidTokenError, 
 	TokenNotFoundError,
@@ -20,7 +23,6 @@ const authExpirySeconds = parseInt(process.env.AUTH_EXP_SECONDS);
 const verifyEmailExpirySeconds = parseInt(process.env.EMAIL_VERIFICATION_EXP_SECONDS);
 
 const createUser = async function(obj){
-	
 	checkPasswordStrength(obj.password);
 	obj.password = await encryptPassword(obj.password);
 
@@ -53,7 +55,7 @@ const generateVerificationToken = (email) => {
 	}, jwtSignature, {expiresIn: verifyEmailExpirySeconds});
 
 	const expiryDate = new Date()
-	expiryDate.setSeconds(expiryDate.getSeconds() + authExpirySeconds);	
+	expiryDate.setSeconds(expiryDate.getSeconds() + verifyEmailExpirySeconds);	
 
 	return new Token({access: 'verify',token,expiry: expiryDate.getTime()/1000})
 }
@@ -71,7 +73,9 @@ const recreateVerificationCode = async (email) => {
 }
 
 const checkPasswordStrength = function(password){
-	if(!password) return;
+	if(!password){
+		throw new ValidationError({'password':'password is required'});
+	}
 
 	const passwordStrength = owasp.test(password);
 	if(!passwordStrength.strong){

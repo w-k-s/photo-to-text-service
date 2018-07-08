@@ -23,7 +23,8 @@
     "app": "node app.js",
     "debug": "node --inspect-brk app.js",
     "app-watch": "nodemon --exec 'npm run app'",
-    "test": "export \"NODE_ENV=test\" || SET \"NODE_ENV=test\" && mocha --exit account/**/*.test.js"
+    "test": "export \"NODE_ENV=test\" || SET \"NODE_ENV=test\" && mocha --exit account/**/*.test.js",
+    "test-debug": "export \"NODE_ENV=test\" || SET \"NODE_ENV=test\" && mocha --inspect-brk --exit account/**/*.test.js"
   },
   "author": "W.K.S",
   "license": "ISC"

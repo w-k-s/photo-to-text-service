@@ -3,12 +3,12 @@ const expect = require('expect');
 const {AssertionError} = require('assert');
 const {ObjectId} = require('mongodb');
 
-require('./../../config/config.js')
+require('./../../config/config.js');
 const {initDb,getDb} = require('./../../db');
 const {User} = require('./../models');
 const {DuplicateAccountError} = require('./../errors');
 const userRepository = require('./userRepository.js');
-const usersCollection = 'users';
+const usersCollection = process.env.MONGODB_NAME;
 
 describe('userRepository',()=>{
 
@@ -19,7 +19,7 @@ describe('userRepository',()=>{
 	let user;
 
 	beforeEach(async ()=>{
-		await getDb().collection(usersCollection).remove({})
+		await getDb().collection(usersCollection).remove({});
 		user = new User({
 			firstName: 'Joe',
 			lastName: 'Blogs',
@@ -42,7 +42,7 @@ describe('userRepository',()=>{
 		]});
 
 		const res = await userRepository.saveUser(user);
-		user._id = res.toHexString();
+		user._id = res;
 	});
 
 	describe('saveUser',()=>{

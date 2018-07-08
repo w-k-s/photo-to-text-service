@@ -5,14 +5,14 @@ POST /users
 [-] email must be unique (http 400, domain account, code 1102)
 [-] sends confirmation email
 [-] verification code is jwt which expires in one week
-[-] if email is valid, create user with first name, last name, email, password, isActive, createDate, lastLogin, isStaff, permissions, groups
+- if email is valid, create user with first name, last name, email, password, isActive, createDate, lastLogin, isStaff, permissions, groups
 
 GET /users/verify/:token
 [-] checks if verification token has expired (http 400. domain: "account", code: 1200, "Verification code has expired")
 [-] Activate user account
 
-POST /users/reverify
-[-] Resends verification code
+POST /users/resendVerificationCode
+- Resends verification code
 
 POST users/login
 - returns jwt token given email, password
@@ -47,11 +47,8 @@ GET /users/me (authenticated)
 [-] Helpful password error mesaage
 [-] Single db instance
 [-] Close db
-- Unit Test for Services & Controllers
-- Login
-- Logout
+- Unit Test
 - Localize
-- Message Queues
 
 4. References
 

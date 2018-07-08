@@ -182,6 +182,16 @@ describe('User',()=>{
 			expect(token).toBeTruthy();
 			expect(token.access).toEqual('verify');
 		})
+	});
+
+	describe('getAuthToken',()=>{
+
+		it('should return token with access type auth',()=>{
+			const user = new User(userObj);
+			const token = user.getAuthToken();
+			expect(token).toBeTruthy();
+			expect(token.access).toEqual('auth');
+		})
 	})
 
 });

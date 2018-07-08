@@ -51,6 +51,10 @@ class User{
 	getVerifyEmailToken(){
 		return this.tokens.filter((token)=>token.access === "verify")[0];
 	}
+
+	getAuthToken(){
+		return this.tokens.filter((token)=>token.access === "auth")[0];
+	}
 }
 
 module.exports = User
