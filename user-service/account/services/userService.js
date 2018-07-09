@@ -103,8 +103,8 @@ const encryptPassword = (password) => {
 }
 
 const verifyUser = async (verificationToken) => {
-
-	const user = await userRepository.userWithVerificationToken(verificationToken);
+	debugger;
+	let user = await userRepository.userWithVerificationToken(verificationToken);
 	if(!user){
 		throw new TokenNotFoundError();
 	}
@@ -114,12 +114,11 @@ const verifyUser = async (verificationToken) => {
 	}catch(e){
 		throw new InvalidTokenError(e);
 	}finally{
-		await userRepository.removeVerificationToken(verificationToken);
+		user = await userRepository.removeVerificationToken(verificationToken);
 	}
 
 	user.isActive = true;
-	userRepository.updateUser(user);
-	return user;
+	return await userRepository.updateUser(user);
 }
 
 module.exports = {

@@ -10,4 +10,6 @@ jobs:
       - image: "circleci/mongo:3.6.0"
     steps: 
       - checkout
-      - run: cd user-service; npm install;ls -a ./node_modules; npm test
+    test:
+      override:
+        - cd user-service; npm install; npm test

@@ -12,7 +12,7 @@ GET /users/verify/:token
 [-] Activate user account
 
 POST /users/resendVerificationCode
-- Resends verification code
+[-] Resends verification code
 
 POST users/login
 - returns jwt token given email, password
@@ -47,7 +47,10 @@ GET /users/me (authenticated)
 [-] Helpful password error mesaage
 [-] Single db instance
 [-] Close db
-- Unit Test
+[-] Unit Test Services
+- Unit test controllers
+- Login 
+- Logout
 - Localize
 
 4. References

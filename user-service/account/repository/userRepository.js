@@ -45,7 +45,7 @@ const updateUser = async (user) => {
 	obj = _.omit(obj,'_id');
 
 	try{
-		const result =  await getUsersCollection().findOneAndUpdate({_id: ObjectId(user._id), email: user.email},{$set: obj},{returnNewDocument: true})
+		const result =  await getUsersCollection().findOneAndUpdate({_id: ObjectId(user._id), email: user.email},{$set: obj},{returnOriginal: false})
 		if(!result){
 			return null;
 		}
@@ -90,9 +90,22 @@ const userWithVerificationToken = async (verificationToken) => {
 	return new User(obj);
 }
 
+const removeVerificationToken = async(verificationToken) => {
+	const doc = await getUsersCollection().findOneAndUpdate({},{$pull:{
+		'tokens':{'token':verificationToken}
+	}},{returnOriginal: false});
+	const obj = doc.value;
+	if(!obj){
+		return null;
+	}
+	obj._id = obj._id.toHexString();
+	return new User(obj);
+}
+
 module.exports = {
 	saveUser,
 	updateUser,
 	userWithVerificationToken,
-	findUserWithEmail
+	findUserWithEmail,
+	removeVerificationToken
 };

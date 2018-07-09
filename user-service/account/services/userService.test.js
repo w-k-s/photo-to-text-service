@@ -6,7 +6,10 @@ require('./../../config/config.js');
 const {User} = require('./../models');
 const userService = require('./userService.js');
 const userRepository = require('./../repository');
-const {WeakPasswordError, AccountNotFoundError} = require('./../errors');
+const {WeakPasswordError, 
+	AccountNotFoundError,
+	InvalidTokenError,
+	TokenNotFoundError} = require('./../errors');
 
 const {initDb,getDb} = require('./../../db');
 const {logObj} = require('./../../utils');
@@ -218,12 +221,15 @@ describe('UserService',()=>{
 			expect(check()).rejects;
 		});
 
-		it('should throw AccountNotFoundError if no user with email found',()=>{
-			async function check() {
-			  await userService.recreateVerificationCode('null');
+		it('should throw AccountNotFoundError if no user with email found',async ()=>{
+			
+			try{
+				await userService.recreateVerificationCode('null');
+			}catch(e){
+				if(!(e instanceof AccountNotFoundError)){
+					throw e;
+				}
 			}
-
-			expect(check()).rejects.toEqual(AccountNotFoundError);
 		});
 
 		it('should replace verify token if exists',async ()=>{
@@ -235,7 +241,6 @@ describe('UserService',()=>{
 		it('should add verify token if not exists',async ()=>{
 			await getDb().collection(usersCollection).update({email: user.email},{$set: {'tokens':[]}});
 			const updatedUser = await userService.recreateVerificationCode(user.email);
-			logObj('updatedUser',updatedUser);
 			expect(updatedUser.tokens.length).toEqual(1);
 			expect(updatedUser.tokens[0].access).toEqual('verify');
 		});
@@ -243,16 +248,47 @@ describe('UserService',()=>{
 
 	describe('verifyUser',()=>{
 
-		it('should throw TokenNotFoundError if user with token not found',()=>{
+		let user;
 
+		beforeEach(async ()=>{
+			debugger;
+			user = await userService.createUser(obj);
 		});
 
-		it('should throw InvalidTokenError and delete stored token if provided token invalid',()=>{
-
+		it('should throw TokenNotFoundError if user with token not found',async ()=>{
+			try{
+				await userService.verifyUser('token');
+			}catch(e){
+				if(!(e instanceof TokenNotFoundError)){
+					throw e;
+				}
+			}
 		});
 
-		it('should set isActive to true and delete stored token if provided token is valid',()=>{
+		it('should throw InvalidTokenError and delete stored token if provided token invalid',async ()=>{
+			const invalidToken = user.getVerifyEmailToken().token + '123';
+			user.getVerifyEmailToken().token = invalidToken;
+			await getDb().collection(usersCollection).findOneAndUpdate({email: user.email},{$set:{'tokens':user.tokens}});
 
+			try{
+				await userService.verifyUser(invalidToken);
+			}catch(e){
+				if(!(e instanceof InvalidTokenError)){
+					throw e;
+				}
+			}
+
+			const count = await getDb().collection(usersCollection).count({'tokens':{$elemMatch: {'token':invalidToken}}});
+			expect(count).toBe(0);
+		});
+
+		it('should set isActive to true and delete stored token if provided token is valid',async ()=>{
+			const userTokensCount = user.tokens.length;
+			const verifiedUser = await userService.verifyUser(user.getVerifyEmailToken().token);
+			expect(verifiedUser.isActive).toBe(true);
+
+			const obj = await getDb().collection(usersCollection).findOne({email: user.email});
+			expect(verifiedUser.tokens.length).toBe(userTokensCount - 1);
 		});
 
 	});

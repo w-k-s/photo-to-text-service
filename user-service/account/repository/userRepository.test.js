@@ -4,8 +4,9 @@ const {AssertionError} = require('assert');
 const {ObjectId} = require('mongodb');
 
 require('./../../config/config.js');
+const {logObj} = require('./../../utils');
 const {initDb,getDb} = require('./../../db');
-const {User} = require('./../models');
+const {User,Token} = require('./../models');
 const {DuplicateAccountError} = require('./../errors');
 const userRepository = require('./userRepository.js');
 const usersCollection = process.env.MONGODB_NAME;
@@ -68,14 +69,14 @@ describe('userRepository',()=>{
 
 		it('should update user', async () => {
 			user.firstName = 'Jack';
-			user.token = 'token';
+			user.tokens = [new Token({access: 'auth',token:'token',expiry: new Date()})];
 
 			const updatedUser = await userRepository.updateUser(user);
 			const doc = await getDb().collection(usersCollection).findOne({_id: ObjectId(user._id)});
 
 			expect(doc._id.toHexString()).toEqual(updatedUser._id);
 			expect(doc.firstName).toEqual(user.firstName);
-			expect(doc.token).toEqual(user.token);
+			expect(doc.tokens[0].token).toEqual(user.tokens[0].token);
 		});
 
 		it('should throw assertion error user id is undefined',async () => {
@@ -113,19 +114,31 @@ describe('userRepository',()=>{
 	describe('userWithVerificationToken',()=>{
 
 		it('should return user with matching verify token', async () => {
-			const doc = await userRepository.userWithVerificationToken(user.tokens[1].token);
-			expect(doc._id).toEqual(user._id);
+			const matchingUser = await userRepository.userWithVerificationToken(user.tokens[1].token);
+			expect(matchingUser instanceof User).toBe(true);
+			expect(matchingUser._id).toEqual(user._id);
 		});
 
 		it('should return null for matching auth token', async () => {
-			const doc = await userRepository.userWithVerificationToken(user.tokens[0].token);
-			expect(doc).toBeFalsy();
+			const matchingUser = await userRepository.userWithVerificationToken(user.tokens[0].token);
+			expect(matchingUser).toBeFalsy();
 		});
 
 		it('should return null for no matching token', async () => {
-			const doc = await userRepository.userWithVerificationToken('3241311232113131213');
-			expect(doc).toBeFalsy();
+			const matchingUser = await userRepository.userWithVerificationToken('3241311232113131213');
+			expect(matchingUser).toBeFalsy();
 		});
+	});
+
+	describe('removeVerificationToken',()=>{
+
+		it('should remove  matching verify token', async () => {
+			const updatedUser = await userRepository.removeVerificationToken(user.tokens[1].token);
+			expect(updatedUser instanceof User).toBe(true);
+			expect(updatedUser.tokens.length).toBe(1);
+			expect(updatedUser.tokens[0].access).toEqual('auth');
+		});
+
 	});
 	
 	describe('findUserWithEmail',()=>{
