@@ -30,7 +30,7 @@ const insertUser = async (user)=>{
 		return res.insertedIds[0].toString();
 	}catch(err){
 		if(err.code == mongoDuplicateKeyErrorCode){
-			throw new DuplicateAccountError(err)
+			throw new DuplicateAccountError(err.message)
 		}
 		throw err;
 	}

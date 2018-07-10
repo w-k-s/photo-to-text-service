@@ -16,7 +16,11 @@ class ValidationError extends BaseError{
 
 class DuplicateAccountError extends BaseError{}
 
-class WeakPasswordError extends BaseError{}
+class WeakPasswordError extends ValidationError{
+	constructor(fields,message){
+		super(fields,message);
+	}
+}
 
 class TokenNotFoundError extends BaseError{}
 

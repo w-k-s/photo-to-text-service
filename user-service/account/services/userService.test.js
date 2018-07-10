@@ -251,7 +251,6 @@ describe('UserService',()=>{
 		let user;
 
 		beforeEach(async ()=>{
-			debugger;
 			user = await userService.createUser(obj);
 		});
 

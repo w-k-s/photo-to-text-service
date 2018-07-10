@@ -23,19 +23,23 @@ const authExpirySeconds = parseInt(process.env.AUTH_EXP_SECONDS);
 const verifyEmailExpirySeconds = parseInt(process.env.EMAIL_VERIFICATION_EXP_SECONDS);
 
 const createUser = async function(obj){
-	checkPasswordStrength(obj.password);
-	obj.password = await encryptPassword(obj.password);
+	try{
+		checkPasswordStrength(obj.password);
+		obj.password = await encryptPassword(obj.password);
 
-	obj.isActive = false;
-	obj.isStaff = false;
-	obj.createDate = new Date();
-	
-	let user = new User(obj);
-	user._id = await userRepository.saveUser(user);
-	user.tokens.push(generateAuthToken(user._id));
-	user.tokens.push(generateVerificationToken(user.email))
-	await userRepository.updateUser(user);
-	return user;
+		obj.isActive = false;
+		obj.isStaff = false;
+		obj.createDate = new Date();
+		
+		let user = new User(obj);
+		user._id = await userRepository.saveUser(user);
+		user.tokens.push(generateAuthToken(user._id));
+		user.tokens.push(generateVerificationToken(user.email))
+		await userRepository.updateUser(user);
+		return user;
+	}catch(e){
+		throw e;
+	}
 }
 
 const generateAuthToken = (id) => {
@@ -80,7 +84,7 @@ const checkPasswordStrength = function(password){
 	const passwordStrength = owasp.test(password);
 	if(!passwordStrength.strong){
 		const message = _.join(passwordStrength.errors,'\n');
-		throw new WeakPasswordError(message);
+		throw new WeakPasswordError({'password':message},message);
 	}
 }
 
@@ -103,7 +107,6 @@ const encryptPassword = (password) => {
 }
 
 const verifyUser = async (verificationToken) => {
-	debugger;
 	let user = await userRepository.userWithVerificationToken(verificationToken);
 	if(!user){
 		throw new TokenNotFoundError();

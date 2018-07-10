@@ -1,11 +1,13 @@
 const Joi = require('joi');
 const _ = require('lodash');
+const {logObj} = require('./../../utils');
 
 const {ErrorResponse, UserResponse} = require('./../models');
 const {userService,emailService} = require('./../services');
 const {contentTypeJson} = require('./validation.js');
 const {domains, 
 	ValidationError, 
+	WeakPasswordError,
 	DuplicateAccountError, 
 	TokenNotFoundError,
 	InvalidTokenError,
@@ -23,7 +25,6 @@ class RegistrationController{
 			return h.response(_.omit(user,['password','tokens']))
 					.code(201)
 		}catch(e){
-			console.log(e)
 			let status = 500;
 			let resp = new ErrorResponse(domains.account.registration.undocumented, e.message);
 			
@@ -46,7 +47,7 @@ class RegistrationController{
 			const user = await userService.verifyUser(verificationToken);
 			return _.omit(user,['password','tokens']);
 		}catch(e){
-			console.log(e)
+			logObj('Error on verifyAccount',e);
 			let status = 500;
 			let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
 			
@@ -70,8 +71,7 @@ class RegistrationController{
 			RegistrationController.sendVerificationEmail(req,user);
 			return _.omit(user,['password','tokens']);
 		}catch(e){
-			debugger;
-			console.log(e)
+			logObj('Error on resendVerificationCode',e);
 			let status = 500;
 			let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
 			
