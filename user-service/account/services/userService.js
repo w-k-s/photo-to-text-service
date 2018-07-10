@@ -14,7 +14,8 @@ const {
 	WeakPasswordError, 
 	InvalidTokenError, 
 	TokenNotFoundError,
-	AccountNotFoundError
+	AccountNotFoundError,
+	ReverifyingActiveAccountError
 } = require('./../errors');
 
 const saltRounds = parseInt(process.env.SALT_ROUNDS);
@@ -27,16 +28,15 @@ const createUser = async function(obj){
 		checkPasswordStrength(obj.password);
 		obj.password = await encryptPassword(obj.password);
 
+		obj._id = userRepository.generateUniqueId();
 		obj.isActive = false;
 		obj.isStaff = false;
 		obj.createDate = new Date();
 		
 		let user = new User(obj);
-		user._id = await userRepository.saveUser(user);
 		user.tokens.push(generateAuthToken(user._id));
 		user.tokens.push(generateVerificationToken(user.email))
-		await userRepository.updateUser(user);
-		return user;
+		return await userRepository.saveUser(user);
 	}catch(e){
 		throw e;
 	}
@@ -70,6 +70,9 @@ const recreateVerificationCode = async (email) => {
 	let user = await userRepository.findUserWithEmail(email);
 	if(!user){
 		throw new AccountNotFoundError(email);
+	}
+	if(user.isActive){
+		throw new ReverifyingActiveAccountError();
 	}
 	user.tokens = user.tokens.filter((token)=> token.access !== 'verify');
 	user.tokens.push(generateVerificationToken(user.email));

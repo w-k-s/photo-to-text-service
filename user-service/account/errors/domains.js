@@ -31,6 +31,10 @@ const domains = {
 				code: 12020,
 				path: 'account.verification.tokenNotValid'
 			},
+			accountAlreadyActive:{
+				code: 12030,
+				path: 'account.vefification.accountAlreadyActive'
+			},
 			undocumented:{
 				code: 12999,
 				path: 'account.verification.undocumented'
@@ -43,11 +47,11 @@ const domains = {
 				path: 'account.login.invalidCredentials'
 			},
 			accountUnverified:{
-				code: 13030,
+				code: 13020,
 				path: 'account.login.accountUnverified'
 			},
 			accountLocked:{
-				code: 13040,
+				code: 13030,
 				path: 'account.login.accountLocked'
 			},
 			undocumented:{

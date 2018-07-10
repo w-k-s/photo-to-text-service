@@ -22,12 +22,18 @@ const getUsersCollection = () => {
 	return getDb().collection(usersCollection);
 }
 
+const generateUniqueId = ()=>{
+	return new ObjectId().toHexString();
+}
+
 const insertUser = async (user)=>{
 	assert(user instanceof User);
+	assert(user._id);
 	const obj = {...user};
+	obj._id = ObjectId(user._id);
 	try{
 		const res = await getUsersCollection().insert(obj);
-		return res.insertedIds[0].toString();
+		return user;
 	}catch(err){
 		if(err.code == mongoDuplicateKeyErrorCode){
 			throw new DuplicateAccountError(err.message)
@@ -103,6 +109,7 @@ const removeVerificationToken = async(verificationToken) => {
 }
 
 module.exports = {
+	generateUniqueId,
 	saveUser,
 	updateUser,
 	userWithVerificationToken,

@@ -16,11 +16,7 @@ class ValidationError extends BaseError{
 
 class DuplicateAccountError extends BaseError{}
 
-class WeakPasswordError extends ValidationError{
-	constructor(fields,message){
-		super(fields,message);
-	}
-}
+class WeakPasswordError extends ValidationError{}
 
 class TokenNotFoundError extends BaseError{}
 
@@ -28,11 +24,14 @@ class InvalidTokenError extends BaseError{}
 
 class AccountNotFoundError extends BaseError{}
 
+class ReverifyingActiveAccountError extends BaseError{}
+
 module.exports = {
 	ValidationError,
 	DuplicateAccountError,
 	WeakPasswordError, 
 	TokenNotFoundError,
 	InvalidTokenError,
-	AccountNotFoundError
+	AccountNotFoundError,
+	ReverifyingActiveAccountError
 }

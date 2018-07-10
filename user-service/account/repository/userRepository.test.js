@@ -1,5 +1,6 @@
 'use strict';
 const expect = require('expect');
+const _ = require('lodash');
 const {AssertionError} = require('assert');
 const {ObjectId} = require('mongodb');
 
@@ -13,15 +14,18 @@ const usersCollection = process.env.MONGODB_NAME;
 
 describe('userRepository',()=>{
 
+	let user;
+	let userId;
+
 	before(async ()=>{
 		await initDb();
+		userId = new ObjectId().toHexString();
 	});
-
-	let user;
 
 	beforeEach(async ()=>{
 		await getDb().collection(usersCollection).remove({});
 		user = new User({
+			_id: userId,
 			firstName: 'Joe',
 			lastName: 'Blogs',
 			email: 'test@gmail.com',
@@ -42,15 +46,26 @@ describe('userRepository',()=>{
 				}
 		]});
 
-		const res = await userRepository.saveUser(user);
-		user._id = res;
+		await userRepository.saveUser(user);
 	});
+
+	describe('generateUniqueId',()=>{
+
+		it('should generate unique ids',()=>{
+			const length = 1000;
+			const ids = [...Array(length)].map(userRepository.generateUniqueId);
+			const uniqueIds = _.uniq(ids);
+			expect(uniqueIds.length).toBe(ids.length);
+		});
+
+	});
+
 
 	describe('saveUser',()=>{
 
 		it('should save user',async ()=>{
 			const doc = await getDb().collection(usersCollection).findOne({email: user.email})
-			expect(user._id.toString()).toEqual(doc._id.toHexString());
+			expect(user._id).toEqual(doc._id.toHexString());
 		});
 	
 		it('should throw DuplicateAccountError when saving users with the same email', async ()=>{

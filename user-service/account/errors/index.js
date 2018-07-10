@@ -6,3 +6,4 @@ module.exports.WeakPasswordError = require('./classes.js').WeakPasswordError;
 module.exports.TokenNotFoundError = require('./classes.js').TokenNotFoundError;
 module.exports.InvalidTokenError = require('./classes.js').InvalidTokenError;
 module.exports.AccountNotFoundError = require('./classes.js').AccountNotFoundError;
+module.exports.ReverifyingActiveAccountError = require('./classes').ReverifyingActiveAccountError;
