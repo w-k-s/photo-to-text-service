@@ -7,7 +7,7 @@ const owasp = require('owasp-password-strength-test');
 const assert = require('assert').strict;
 
 const {logObj} = require('./../../utils');
-const {User, Token} = require('./../models');
+const {User, Token, VerificationCodeRequest} = require('./../models');
 const {userRepository} = require('./../repository');
 const {
 	ValidationError,
@@ -64,8 +64,10 @@ const generateVerificationToken = (email) => {
 	return new Token({access: 'verify',token,expiry: expiryDate.getTime()/1000})
 }
 
-const recreateVerificationCode = async (email) => {
-	assert(email);
+const recreateVerificationCode = async (resendRequest) => {
+	assert(resendRequest instanceof VerificationCodeRequest);
+
+	const email = resendRequest.email;
 
 	let user = await userRepository.findUserWithEmail(email);
 	if(!user){
@@ -113,6 +115,9 @@ const verifyUser = async (verificationToken) => {
 	let user = await userRepository.userWithVerificationToken(verificationToken);
 	if(!user){
 		throw new TokenNotFoundError();
+	}
+	if(user.isActive){
+		throw new ReverifyingActiveAccountError();
 	}
 	
 	try{

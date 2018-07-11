@@ -2,7 +2,7 @@ const Joi = require('joi');
 const _ = require('lodash');
 const {logObj} = require('./../../utils');
 
-const {ErrorResponse, UserResponse} = require('./../models');
+const {VerificationCodeRequest, ErrorResponse, UserResponse} = require('./../models');
 const {userService,emailService} = require('./../services');
 const {contentTypeJson} = require('./validation.js');
 const {domains, 
@@ -58,6 +58,9 @@ class RegistrationController{
 			}else if(e instanceof InvalidTokenError){
 				resp = new ErrorResponse(domains.account.verification.tokenNotValid,e.message)
 				status = 400;
+			}else if(e instanceof ReverifyingActiveAccountError){
+				resp = new ErrorResponse(domains.account.verification.accountAlreadyActive,e.message)
+				status = 400;
 			}
 
 			return h.response(resp)
@@ -67,8 +70,8 @@ class RegistrationController{
 
 	static async resendVerificationCode(req,h,err){
 		try{
-			const body =  _.pick(req.payload, ['email']);
-			const user = await userService.recreateVerificationCode(body.email);
+			const resendRequest = new VerificationCodeRequest(_.pick(req.payload, ['email']));
+			const user = await userService.recreateVerificationCode(resendRequest);
 			RegistrationController.sendVerificationEmail(req,user);
 			return _.omit(user,['password','tokens']);
 		}catch(e){
@@ -77,10 +80,13 @@ class RegistrationController{
 			let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
 			
 			if (e instanceof AccountNotFoundError) {
-				resp = new ErrorResponse(domains.account.accountNotFound,e.message)
+				resp = new ErrorResponse(domains.account.verification.accountNotFound,e.message)
 				status = 404;
 			}else if(e instanceof ReverifyingActiveAccountError){
-				resp = new ErrorResponse(domains.account.vefification.accountAlreadyActive,e.message)
+				resp = new ErrorResponse(domains.account.verification.accountAlreadyActive,e.message)
+				status = 400;
+			}else if (e instanceof ValidationError) {
+				resp = new ErrorResponse(domains.account.verification.validation,undefined,e.fields)
 				status = 400;
 			}
 

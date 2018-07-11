@@ -1,10 +1,6 @@
 const domains = {
 	account: {
 		code: 10000,
-		accountNotFound:{
-			code: 10010,
-			path: 'account.accountNotFound'
-		},
 		registration: {
 			code: 11000,
 			validation: {
@@ -23,17 +19,25 @@ const domains = {
 		},
 		verification:{
 			code: 12000,
-			tokenNotFound:{
+			validation: {
 				code: 12010,
+				path: 'account.verification.validation',
+			},
+			accountNotFound: {
+				code: 12020,
+				path: 'account.verification.accountNotFound'
+			},
+			tokenNotFound:{
+				code: 12030,
 				path: 'account.verification.tokenNotFound'
 			},
 			tokenNotValid:{
-				code: 12020,
+				code: 12040,
 				path: 'account.verification.tokenNotValid'
 			},
 			accountAlreadyActive:{
-				code: 12030,
-				path: 'account.vefification.accountAlreadyActive'
+				code: 12050,
+				path: 'account.verification.accountAlreadyActive'
 			},
 			undocumented:{
 				code: 12999,
@@ -46,12 +50,16 @@ const domains = {
 				code: 13010,
 				path: 'account.login.invalidCredentials'
 			},
-			accountUnverified:{
+			accountNotFound:{
 				code: 13020,
-				path: 'account.login.accountUnverified'
+				path: 'account.login.accountNotFound'
+			},
+			accountUnverified:{
+				code: 13030,
+				path: 'account.login.accountDeactivated'
 			},
 			accountLocked:{
-				code: 13030,
+				code: 13040,
 				path: 'account.login.accountLocked'
 			},
 			undocumented:{

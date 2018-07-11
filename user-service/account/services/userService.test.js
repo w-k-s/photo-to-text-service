@@ -3,13 +3,14 @@ const expect = require('expect');
 const jwt = require('jsonwebtoken');
 
 require('./../../config/config.js');
-const {User} = require('./../models');
+const {User, VerificationCodeRequest} = require('./../models');
 const userService = require('./userService.js');
 const userRepository = require('./../repository');
 const {WeakPasswordError, 
 	AccountNotFoundError,
 	InvalidTokenError,
-	TokenNotFoundError} = require('./../errors');
+	TokenNotFoundError,
+	ReverifyingActiveAccountError} = require('./../errors');
 
 const {initDb,getDb} = require('./../../db');
 const {logObj} = require('./../../utils');
@@ -224,7 +225,8 @@ describe('UserService',()=>{
 		it('should throw AccountNotFoundError if no user with email found',async ()=>{
 			
 			try{
-				await userService.recreateVerificationCode('null');
+				const resendRequest = new VerificationCodeRequest({email: 'null@null.com'});
+				await userService.recreateVerificationCode(resendRequest);
 			}catch(e){
 				if(!(e instanceof AccountNotFoundError)){
 					throw e;
@@ -232,15 +234,31 @@ describe('UserService',()=>{
 			}
 		});
 
+		it('should throw ReverifyingActiveAccountError if account already active',async ()=>{
+		
+			try{
+				const resendRequest = new VerificationCodeRequest({email: user.email});
+				await getDb().collection(usersCollection).update({email: user.email},{$set: {'isActive':true}});
+				await userService.recreateVerificationCode(resendRequest);
+			}catch(e){
+				if(!(e instanceof ReverifyingActiveAccountError)){
+					throw e;
+				}
+			}
+		});
+
 		it('should replace verify token if exists',async ()=>{
 			const originalToken = token;
-			const updatedUser = await userService.recreateVerificationCode(user.email);
+			const resendRequest = new VerificationCodeRequest({email: user.email});
+			const updatedUser = await userService.recreateVerificationCode(resendRequest);
 			expect(originalToken).not.toBe(updatedUser.getVerifyEmailToken());
 		});
 
 		it('should add verify token if not exists',async ()=>{
 			await getDb().collection(usersCollection).update({email: user.email},{$set: {'tokens':[]}});
-			const updatedUser = await userService.recreateVerificationCode(user.email);
+
+			const resendRequest = new VerificationCodeRequest({email: user.email});
+			const updatedUser = await userService.recreateVerificationCode(resendRequest);
 			expect(updatedUser.tokens.length).toEqual(1);
 			expect(updatedUser.tokens[0].access).toEqual('verify');
 		});
@@ -259,6 +277,18 @@ describe('UserService',()=>{
 				await userService.verifyUser('token');
 			}catch(e){
 				if(!(e instanceof TokenNotFoundError)){
+					throw e;
+				}
+			}
+		});
+
+		it('should throw ReverifyingActiveAccountError if account already active',async ()=>{
+			
+			try{
+				await getDb().collection(usersCollection).update({email: user.email},{$set: {'isActive':true}});
+				await userService.verifyUser(user.getVerifyEmailToken().token);
+			}catch(e){
+				if(!(e instanceof ReverifyingActiveAccountError)){
 					throw e;
 				}
 			}
