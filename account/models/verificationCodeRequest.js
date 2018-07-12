@@ -1,5 +1,5 @@
 'use strict'
-const Joi = require('Joi');
+const Joi = require('joi');
 
 const {
     validateJoiResult
