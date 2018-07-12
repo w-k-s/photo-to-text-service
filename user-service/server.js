@@ -7,9 +7,11 @@ const {
     getClient,
     closeDb
 } = require('./db/');
+
 const {
     RegistrationController
 } = require('./account/controllers');
+
 const {
     emailService
 } = require('./account/services');
