@@ -1,119 +1,155 @@
 'use strict';
 const _ = require('lodash');
 const assert = require('assert').strict;
-const {ObjectId} = require('mongodb');
+const {
+    ObjectId
+} = require('mongodb');
 
-const {getDb} = require('./../../db');
-const {logObj} = require('./../../utils');
-const {User, Token} = require('./../models');
-const {DuplicateAccountError} = require('./../errors');
+const {
+    getDb
+} = require('./../../db');
+const {
+    logObj
+} = require('./../../utils');
+const {
+    User,
+    Token
+} = require('./../models');
+const {
+    DuplicateAccountError
+} = require('./../errors');
 
 const usersCollection = process.env.MONGODB_NAME;
 const mongoDuplicateKeyErrorCode = 11000;
 
 
-const saveUser = async (user)=>{
-	const res = await insertUser(user);
-	await indexUsers();
-	return res;
+const saveUser = async (user) => {
+    const res = await insertUser(user);
+    await indexUsers();
+    return res;
 }
 
 const getUsersCollection = () => {
-	return getDb().collection(usersCollection);
+    return getDb().collection(usersCollection);
 }
 
-const generateUniqueId = ()=>{
-	return new ObjectId().toHexString();
+const generateUniqueId = () => {
+    return new ObjectId().toHexString();
 }
 
-const insertUser = async (user)=>{
-	assert(user instanceof User);
-	assert(user._id);
-	const obj = {...user};
-	obj._id = ObjectId(user._id);
-	try{
-		const res = await getUsersCollection().insert(obj);
-		return user;
-	}catch(err){
-		if(err.code == mongoDuplicateKeyErrorCode){
-			throw new DuplicateAccountError(err.message)
-		}
-		throw err;
-	}
+const insertUser = async (user) => {
+    assert(user instanceof User);
+    assert(user._id);
+    const obj = { ...user
+    };
+    obj._id = ObjectId(user._id);
+    try {
+        const res = await getUsersCollection().insert(obj);
+        return user;
+    } catch (err) {
+        if (err.code == mongoDuplicateKeyErrorCode) {
+            throw new DuplicateAccountError(err.message)
+        }
+        throw err;
+    }
 }
 
 const updateUser = async (user) => {
-	assert(user instanceof User);
-	assert(user._id); 
-	assert(user.email);
+    assert(user instanceof User);
+    assert(user._id);
+    assert(user.email);
 
-	let obj = {...user};
-	obj = _.omit(obj,'_id');
+    let obj = { ...user
+    };
+    obj = _.omit(obj, '_id');
 
-	try{
-		const result =  await getUsersCollection().findOneAndUpdate({_id: ObjectId(user._id), email: user.email},{$set: obj},{returnOriginal: false})
-		if(!result){
-			return null;
-		}
-		const updatedObj = result.value;
-		updatedObj._id = updatedObj._id.toHexString();
-		return new User(updatedObj);
-	}catch(err){
-		throw err;
-	}
+    try {
+        const result = await getUsersCollection().findOneAndUpdate({
+            _id: ObjectId(user._id),
+            email: user.email
+        }, {
+            $set: obj
+        }, {
+            returnOriginal: false
+        })
+        if (!result) {
+            return null;
+        }
+        const updatedObj = result.value;
+        updatedObj._id = updatedObj._id.toHexString();
+        return new User(updatedObj);
+    } catch (err) {
+        throw err;
+    }
 }
 
-const indexUsers = async ()=>{
-	await getUsersCollection().createIndex( { 'email': 1 }, { unique: true });
+const indexUsers = async () => {
+    await getUsersCollection().createIndex({
+        'email': 1
+    }, {
+        unique: true
+    });
 }
 
-const findUserWithEmail = async (email) =>{
-	assert(email);
+const findUserWithEmail = async (email) => {
+    assert(email);
 
-	const obj = await getUsersCollection().findOne({
-		'email': email,
-	});
-	if(!obj){
-		return null;
-	}
-	obj._id = obj._id.toHexString();
-	return new User(obj);
+    const obj = await getUsersCollection().findOne({
+        'email': email,
+    });
+    if (!obj) {
+        return null;
+    }
+    obj._id = obj._id.toHexString();
+    return new User(obj);
 }
 
 const userWithVerificationToken = async (verificationToken) => {
-	const obj =  await getUsersCollection().findOne({
-		'tokens':{$elemMatch: {
-			'access':'verify',
-			'token':verificationToken
-		}}
-	});
-	if(!obj){
-		return null;
-	}
-	obj._id = obj._id.toHexString();
-	return new User(obj);
+    const obj = await getUsersCollection().findOne({
+        'tokens': {
+            $elemMatch: {
+                'access': 'verify',
+                'token': verificationToken
+            }
+        }
+    });
+    if (!obj) {
+        return null;
+    }
+    obj._id = obj._id.toHexString();
+    return new User(obj);
 }
 
-const removeVerificationToken = async(verificationToken) => {
-	const doc = await getUsersCollection()
-		.findOneAndUpdate(
-			{'tokens':{$elemMatch: {'token':verificationToken}}},
-			{$pull:{'tokens':{'token':verificationToken}}},
-			{returnOriginal: false}
-		);
-	const obj = doc.value;
-	if(!obj){
-		return null;
-	}
-	obj._id = obj._id.toHexString();
-	return new User(obj);
+const removeVerificationToken = async (verificationToken) => {
+    const doc = await getUsersCollection()
+        .findOneAndUpdate({
+            'tokens': {
+                $elemMatch: {
+                    'token': verificationToken
+                }
+            }
+        }, {
+            $pull: {
+                'tokens': {
+                    'token': verificationToken
+                }
+            }
+        }, {
+            returnOriginal: false
+        });
+    const obj = doc.value;
+    if (!obj) {
+        return null;
+    }
+    obj._id = obj._id.toHexString();
+    return new User(obj);
 }
 
 module.exports = {
-	generateUniqueId,
-	saveUser,
-	updateUser,
-	userWithVerificationToken,
-	findUserWithEmail,
-	removeVerificationToken
+    generateUniqueId,
+    saveUser,
+    updateUser,
+    userWithVerificationToken,
+    findUserWithEmail,
+    removeVerificationToken
 };
