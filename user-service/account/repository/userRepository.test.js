@@ -17,9 +17,13 @@ describe('userRepository',()=>{
 	let user;
 	let userId;
 
+	let user2;
+	let userId2;
+
 	before(async ()=>{
 		await initDb();
 		userId = new ObjectId().toHexString();
+		userId2 = new ObjectId().toHexString();
 	});
 
 	beforeEach(async ()=>{
@@ -47,6 +51,22 @@ describe('userRepository',()=>{
 		]});
 
 		await userRepository.saveUser(user);
+
+		user2 = new User({...user});
+		user2._id = userId2;
+		user2.email = 'test2@gmail.com';
+		user2.tokens = [
+				{
+					access:'auth',
+					token: '9779798',
+					expiry: new Date()
+				},
+				{
+					access:'verify',
+					token: '98228982',
+					expiry: new Date()
+				}];
+		await userRepository.saveUser(user2);
 	});
 
 	describe('generateUniqueId',()=>{
@@ -147,8 +167,9 @@ describe('userRepository',()=>{
 	describe('removeVerificationToken',()=>{
 
 		it('should remove  matching verify token', async () => {
-			const updatedUser = await userRepository.removeVerificationToken(user.tokens[1].token);
+			const updatedUser = await userRepository.removeVerificationToken(user2.tokens[1].token);
 			expect(updatedUser instanceof User).toBe(true);
+			expect(updatedUser.email).toEqual(user2.email)
 			expect(updatedUser.tokens.length).toBe(1);
 			expect(updatedUser.tokens[0].access).toEqual('auth');
 		});

@@ -44,12 +44,12 @@ describe('User',()=>{
 			expect(user.password).toEqual(userObj.password);
 			expect(user.isActive).toEqual(userObj.isActive);
 			expect(user.isStaff).toEqual(userObj.isStaff);
-			expect(user.createDate).toEqual(userObj.createDate.getTime()/1000);
+			expect(user.createDate).toEqual(parseInt(userObj.createDate.getTime()/1000));
 			expect(user.lastLogin).toBeFalsy();
 			expect(user.tokens.length).toEqual(userObj.tokens.length);
 			expect(user.tokens[0].access).toEqual(userObj.tokens[0].access);
 			expect(user.tokens[0].token).toEqual(userObj.tokens[0].token);
-			expect(user.tokens[0].expiry).toEqual(userObj.tokens[0].expiry.getTime()/1000);
+			expect(user.tokens[0].expiry).toEqual(parseInt(userObj.tokens[0].expiry.getTime()/1000));
 		})
 
 		it('should validate id is optional',()=>{
@@ -142,7 +142,7 @@ describe('User',()=>{
 
 		it('should validate createDate is timestamp',()=>{
 			const user = new User(userObj);
-			expect(user.createDate).toEqual(createDate.getTime()/1000);
+			expect(user.createDate).toEqual(parseInt(createDate.getTime()/1000));
 		});
 
 		it('should validate lastLogin is optional',()=>{
@@ -154,7 +154,7 @@ describe('User',()=>{
 			const lastLogin = new Date();
 			userObj.lastLogin = lastLogin;
 			const user = new User(userObj);
-			expect(user.lastLogin).toBe(lastLogin.getTime()/1000);
+			expect(user.lastLogin).toBe(parseInt(lastLogin.getTime()/1000));
 		});
 
 		it('should validate tokens defaults to empty array',()=>{

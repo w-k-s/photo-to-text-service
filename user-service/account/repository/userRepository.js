@@ -57,7 +57,6 @@ const updateUser = async (user) => {
 		}
 		const updatedObj = result.value;
 		updatedObj._id = updatedObj._id.toHexString();
-		updatedObj.createDate = new Date();
 		return new User(updatedObj);
 	}catch(err){
 		throw err;
@@ -78,7 +77,6 @@ const findUserWithEmail = async (email) =>{
 		return null;
 	}
 	obj._id = obj._id.toHexString();
-	obj.createDate = new Date();
 	return new User(obj);
 }
 
@@ -97,9 +95,12 @@ const userWithVerificationToken = async (verificationToken) => {
 }
 
 const removeVerificationToken = async(verificationToken) => {
-	const doc = await getUsersCollection().findOneAndUpdate({},{$pull:{
-		'tokens':{'token':verificationToken}
-	}},{returnOriginal: false});
+	const doc = await getUsersCollection()
+		.findOneAndUpdate(
+			{'tokens':{$elemMatch: {'token':verificationToken}}},
+			{$pull:{'tokens':{'token':verificationToken}}},
+			{returnOriginal: false}
+		);
 	const obj = doc.value;
 	if(!obj){
 		return null;

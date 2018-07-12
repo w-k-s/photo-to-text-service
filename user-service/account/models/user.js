@@ -33,13 +33,13 @@ class User{
 
 		this.createDate = createDate;
 		if(createDate instanceof Date){
-			this.createDate = createDate.getTime()/1000;
+			this.createDate = parseInt(createDate.getTime()/1000);
 		}
 
 		if(lastLogin){
 			this.lastLogin = lastLogin;
 			if(lastLogin instanceof Date){
-				this.lastLogin = lastLogin.getTime()/1000;
+				this.lastLogin = parseInt(lastLogin.getTime()/1000);
 			}
 		}
 

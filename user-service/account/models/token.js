@@ -19,7 +19,7 @@ class Token{
 		this.token = token;
 
 		if(expiry instanceof Date){
-			this.expiry = expiry.getTime()/1000;
+			this.expiry = parseInt(expiry.getTime()/1000);
 		}else{
 			this.expiry = expiry;
 		}

@@ -15,7 +15,7 @@ describe('Token',()=>{
 			expect(token).toBeTruthy();
 			expect(token.access).toEqual(access);
 			expect(token.token).toEqual(tokenString);
-			expect(token.expiry).toEqual(expiry.getTime()/1000)
+			expect(token.expiry).toEqual(parseInt(expiry.getTime()/1000))
 		})
 
 		it('should validate access is required',()=>{

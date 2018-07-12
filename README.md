@@ -48,7 +48,7 @@ GET /users/me (authenticated)
 [-] Helpful password error mesaage
 [-] Single db instance
 [-] Close db
-- Unit Test for Services & Controllers
+[-] Unit Test for Services & Controllers
 - Login
 - Logout
 - Localize
