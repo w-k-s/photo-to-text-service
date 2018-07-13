@@ -9,7 +9,8 @@ const {
 } = require('./db/');
 
 const {
-    RegistrationController
+    RegistrationController,
+    HomeController
 } = require('./account/controllers');
 
 const {
@@ -52,16 +53,7 @@ const server = Hapi.server({
     port: 3000
 })
 
-server.route({
-    method: 'GET',
-    path: '/',
-    handler: (request, h) => {
-        debugger;
-        return `User API`;
-    }
-});
-
-
+server.route(HomeController.home);
 server.route(RegistrationController.createUser)
 server.route(RegistrationController.verifyAccount);
 server.route(RegistrationController.resendVerificationCode);
