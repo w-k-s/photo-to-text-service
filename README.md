@@ -1,31 +1,38 @@
 This project was supposed to be a mono repository but 
-1. Routes
 
-POST /users
-[-] create temp users given email, password, first name, last name, 
-[-] email must be unique (http 400, domain account, code 1102)
-[-] sends confirmation email
-[-] verification code is jwt which expires in one week
-[-] if email is valid, create user with first name, last name, email, password, isActive, createDate, lastLogin, isStaff, permissions, groups
+### 1. Routes
 
-GET /users/verify/:token
-[-] checks if verification token has expired (http 400. domain: "account", code: 1200, "Verification code has expired")
-[-] Activate user account
+##### POST /users
 
-POST /users/reverify
-[-] Resends verification code
+- [x] Create temp users given email, password, first name, last name, 
+- [x] Email must be unique (http 400, domain account, code 1102)
+- [x] Sends confirmation email
+- [x] Verification code is jwt which expires in one week
+- [x] If email is valid, create user with first name, last name, email, password, isActive, createDate, lastLogin, isStaff, permissions, groups
 
-POST users/login
-- returns jwt token given email, password
+##### GET /users/verify/:token
 
-DELETE /users/me/token
-- logs out user
+- [x] checks if verification token has expired (http 400. domain: "account", code: 1200, "Verification code has expired")
+- [x] Activate user account
 
-GET /users/me (authenticated)
-- returns user
+##### POST /users/reverify
+
+- [x] Resends verification code
+
+##### POST users/login
+
+- [ ] returns jwt token given email, password
+
+##### DELETE /users/me/token
+
+- [ ] logs out user
+
+##### GET /users/me (authenticated)
+
+- [ ] returns user
 
 
-2. Error Codes (v1)
+### 2. Error Codes (v1)
   
 10000. - Account
 11000. -- Registration
@@ -42,18 +49,18 @@ GET /users/me (authenticated)
 13040. --- account with email is blocked
 13999. --- Undocumented Login error
 
-3. Todo
+### 3. Todo
 
-[-] Encrypt password
-[-] Helpful password error mesaage
-[-] Single db instance
-[-] Close db
-[-] Unit Test for Services & Controllers
-- Login
-- Logout
-- Localize
-- Message Queues
+- [x] Encrypt password
+- [x] Helpful password error mesaage
+- [x] Single db instance
+- [x] Close db
+- [x] Unit Test for Services & Controllers
+- [ ] Login
+- [ ] Logout
+- [ ] Localize
+- [ ] Message Queues
 
-4. References
+### 4. References
 
-[How to use arguments and parameters in ecmascript](https://www.smashingmagazine.com/2016/07/how-to-use-arguments-and-parameters-in-ecmascript-6/)
+- [How to use arguments and parameters in ecmascript](https://www.smashingmagazine.com/2016/07/how-to-use-arguments-and-parameters-in-ecmascript-6/)
