@@ -18,11 +18,15 @@ class DuplicateAccountError extends BaseError {}
 
 class WeakPasswordError extends ValidationError {}
 
-class TokenNotFoundError extends BaseError {}
+class IncorrectPasswordError extends BaseError {}
 
 class InvalidTokenError extends BaseError {}
 
 class AccountNotFoundError extends BaseError {}
+
+class AccountNotVerifiedError extends BaseError {}
+
+class UnauthorizedAccessError extends BaseError{}
 
 class ReverifyingActiveAccountError extends BaseError {}
 
@@ -30,8 +34,10 @@ module.exports = {
     ValidationError,
     DuplicateAccountError,
     WeakPasswordError,
-    TokenNotFoundError,
     InvalidTokenError,
+    UnauthorizedAccessError,
+    IncorrectPasswordError,
     AccountNotFoundError,
+    AccountNotVerifiedError,
     ReverifyingActiveAccountError
 }

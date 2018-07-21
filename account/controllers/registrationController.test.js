@@ -200,8 +200,8 @@ describe('RegistrationController', () => {
                 .send(body)
                 .expect(404, (err, resp) => {
                     const errorResponse = JSON.parse(resp.text);
-                    expect(errorResponse.code).toBe(domains.account.verification.tokenNotFound.code);
-                    expect(errorResponse.path).toBe(domains.account.verification.tokenNotFound.path);
+                    expect(errorResponse.code).toBe(domains.account.verification.accountNotFound.code);
+                    expect(errorResponse.path).toBe(domains.account.verification.accountNotFound.path);
                     done();
                 });
         });
@@ -376,7 +376,7 @@ describe('RegistrationController', () => {
             request(server.listener)
                 .post(`/users/resendVerificationCode`)
                 .set('content-type', 'application/json')
-                .send(body)
+                .send({email: body.email})
                 .expect(200, (err, resp) => {
                     const user = JSON.parse(resp.text);
                     expect(user._id).toBeTruthy();

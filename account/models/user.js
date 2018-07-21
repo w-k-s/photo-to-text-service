@@ -1,5 +1,7 @@
-const _ = require('lodash')
-const Joi = require('joi')
+'use strict';
+const _ = require('lodash');
+const Joi = require('joi');
+const assert = require('assert');
 
 const {
     Token
@@ -35,7 +37,7 @@ class User {
         lastLogin,
         tokens = new Array()
     }) {
-        validateJoiResult(Joi.validate(arguments[0], userSchema));
+        User.validate(arguments[0]);
 
         this._id = _id;
         this.email = email;
@@ -65,12 +67,43 @@ class User {
         }
     }
 
+    static validate({
+        _id,
+        email,
+        password,
+        firstName,
+        lastName,
+        isActive = false,
+        isStaff = false,
+        createDate = Date.now(),
+        lastLogin,
+        tokens = new Array()
+    }) {
+        validateJoiResult(Joi.validate(arguments[0], userSchema));
+    }
+
     getVerifyEmailToken() {
         return this.tokens.filter((token) => token.access === "verify")[0];
     }
 
+    setVerifyEmailToken(token) {
+        Token.validate(token);
+        assert(token.access === 'verify');
+
+        _.remove(this.tokens, (token) => token.access === 'verify');
+        this.tokens.push(token);
+    }
+
     getAuthToken() {
         return this.tokens.filter((token) => token.access === "auth")[0];
+    }
+
+    setAuthToken(token) {
+        Token.validate(token);
+        assert(token.access === 'auth');
+
+        _.remove(this.tokens, (token) => token.access === 'auth');
+        this.tokens.push(token);
     }
 }
 

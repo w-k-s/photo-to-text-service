@@ -166,21 +166,21 @@ describe('userRepository', () => {
         });
     });
 
-    describe('userWithVerificationToken', () => {
+    describe('findUserWithVerificationToken', () => {
 
         it('should return user with matching verify token', async () => {
-            const matchingUser = await userRepository.userWithVerificationToken(user.tokens[1].token);
+            const matchingUser = await userRepository.findUserWithVerificationToken(user.tokens[1].token);
             expect(matchingUser instanceof User).toBe(true);
             expect(matchingUser._id).toEqual(user._id);
         });
 
         it('should return null for matching auth token', async () => {
-            const matchingUser = await userRepository.userWithVerificationToken(user.tokens[0].token);
+            const matchingUser = await userRepository.findUserWithVerificationToken(user.tokens[0].token);
             expect(matchingUser).toBeFalsy();
         });
 
         it('should return null for no matching token', async () => {
-            const matchingUser = await userRepository.userWithVerificationToken('3241311232113131213');
+            const matchingUser = await userRepository.findUserWithVerificationToken('3241311232113131213');
             expect(matchingUser).toBeFalsy();
         });
     });

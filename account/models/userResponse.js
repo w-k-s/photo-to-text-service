@@ -2,11 +2,15 @@
 
 const _ = require('lodash');
 
+const User = require('./user.js');
+
 class UserResponse {
     constructor(user) {
-        console.log(`user: ${JSON.stringify(user,undefined,2)}`);
-        Object.assign(_.omit(user, ['password', 'tokens']), this);
-        console.log(`user: ${JSON.stringify(this,undefined,2)}`);
+        User.validate(user);
+        const resp = _.omit(user, ['password', 'tokens']);
+        for (var key in resp) {
+            this[key] = resp[key];
+        }
     }
 }
 

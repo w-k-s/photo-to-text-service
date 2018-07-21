@@ -14,8 +14,13 @@ class VerificationCodeRequest {
     constructor({
         email
     }) {
-        validateJoiResult(Joi.validate(arguments[0], verificationCodeRequestSchema));
+        VerificationCodeRequest.validate(arguments[0]);
         this.email = email;
+    }
+
+    static validate() {
+        validateJoiResult(Joi.validate(arguments[0],
+            verificationCodeRequestSchema));
     }
 }
 

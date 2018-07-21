@@ -27,10 +27,6 @@ const domains = {
                 code: 12020,
                 path: 'account.verification.accountNotFound'
             },
-            tokenNotFound: {
-                code: 12030,
-                path: 'account.verification.tokenNotFound'
-            },
             tokenNotValid: {
                 code: 12040,
                 path: 'account.verification.tokenNotValid'
@@ -46,21 +42,29 @@ const domains = {
         },
         login: {
             code: 13000,
-            invalidCredentials: {
+            unauthorizedAccess:{
                 code: 13010,
+                path: 'account.login.unauthorizedAccess'
+            },
+            validation: {
+                code: 13020,
+                path: 'account.login.validation'
+            },
+            invalidCredentials: {
+                code: 13030,
                 path: 'account.login.invalidCredentials'
             },
             accountNotFound: {
-                code: 13020,
+                code: 13040,
                 path: 'account.login.accountNotFound'
             },
             accountUnverified: {
-                code: 13030,
-                path: 'account.login.accountDeactivated'
+                code: 13050,
+                path: 'account.login.accountUnverified'
             },
-            accountLocked: {
-                code: 13040,
-                path: 'account.login.accountLocked'
+            sessionExpired: {
+                code: 13060,
+                path: 'account.login.sessionExpired'
             },
             undocumented: {
                 code: 13999,

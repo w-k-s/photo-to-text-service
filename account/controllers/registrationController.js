@@ -21,7 +21,6 @@ const {
     ValidationError,
     WeakPasswordError,
     DuplicateAccountError,
-    TokenNotFoundError,
     InvalidTokenError,
     AccountNotFoundError,
     ReverifyingActiveAccountError
@@ -35,7 +34,7 @@ class RegistrationController {
             const user = await userService.createUser(body);
             RegistrationController.sendVerificationEmail(req, user);
 
-            return h.response(_.omit(user, ['password', 'tokens']))
+            return h.response(new UserResponse(user))
                 .code(201)
         } catch (e) {
             let status = 500;
@@ -58,14 +57,14 @@ class RegistrationController {
         try {
             const verificationToken = req.params.token;
             const user = await userService.verifyUser(verificationToken);
-            return _.omit(user, ['password', 'tokens']);
+            return new UserResponse(user);
         } catch (e) {
             logObj('Error on verifyAccount', e);
             let status = 500;
             let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
 
-            if (e instanceof TokenNotFoundError) {
-                resp = new ErrorResponse(domains.account.verification.tokenNotFound, e.message)
+            if (e instanceof AccountNotFoundError) {
+                resp = new ErrorResponse(domains.account.verification.accountNotFound, e.message)
                 status = 404;
             } else if (e instanceof InvalidTokenError) {
                 resp = new ErrorResponse(domains.account.verification.tokenNotValid, e.message)
@@ -82,12 +81,11 @@ class RegistrationController {
 
     static async resendVerificationCode(req, h, err) {
         try {
-            const resendRequest = new VerificationCodeRequest(_.pick(req.payload, ['email']));
+            const resendRequest = new VerificationCodeRequest(req.payload);
             const user = await userService.recreateVerificationCode(resendRequest);
             RegistrationController.sendVerificationEmail(req, user);
-            return _.omit(user, ['password', 'tokens']);
+            return new UserResponse(user);
         } catch (e) {
-            logObj('Error on resendVerificationCode', e);
             let status = 500;
             let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
 

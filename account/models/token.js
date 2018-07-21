@@ -1,9 +1,9 @@
-"use strict"
+"use strict";
 const Joi = require('joi');
 
 const {
     validateJoiResult
-} = require('./utils.js')
+} = require('./utils.js');
 
 const validAccessTypes = ['auth', 'verify'];
 
@@ -20,7 +20,7 @@ class Token {
         token,
         expiry
     }) {
-        validateJoiResult(Joi.validate(arguments[0], tokenSchema));
+        Token.validate(arguments[0]);
         this.access = access;
         this.token = token;
 
@@ -29,6 +29,14 @@ class Token {
         } else {
             this.expiry = expiry;
         }
+    }
+
+    static validate({
+        access,
+        token,
+        expiry
+    }) {
+        validateJoiResult(Joi.validate(arguments[0], tokenSchema));
     }
 }
 

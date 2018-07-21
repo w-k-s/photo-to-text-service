@@ -59,8 +59,7 @@ const updateUser = async (user) => {
     assert(user._id);
     assert(user.email);
 
-    let obj = { ...user
-    };
+    let obj = { ...user};
     obj = _.omit(obj, '_id');
 
     try {
@@ -104,12 +103,20 @@ const findUserWithEmail = async (email) => {
     return new User(obj);
 }
 
-const userWithVerificationToken = async (verificationToken) => {
+const findUserWithAuthToken = async (authToken) => {
+    return await findUserWithToken('auth',authToken);
+}
+
+const findUserWithVerificationToken = async (verificationToken) => {
+    return await findUserWithToken('verify',verificationToken);
+}
+
+const findUserWithToken = async (access, token) => {
     const obj = await getUsersCollection().findOne({
         'tokens': {
             $elemMatch: {
-                'access': 'verify',
-                'token': verificationToken
+                access,
+                token
             }
         }
     });
@@ -121,35 +128,49 @@ const userWithVerificationToken = async (verificationToken) => {
 }
 
 const removeVerificationToken = async (verificationToken) => {
+    return await removeToken('verify',verificationToken);
+}
+
+const removeAuthToken = async (authToken) => {
+    return await removeToken('auth',authToken);
+}
+
+const removeToken = async(access, token) => {
     const doc = await getUsersCollection()
         .findOneAndUpdate({
             'tokens': {
                 $elemMatch: {
-                    'token': verificationToken
+                    access,
+                    token
                 }
             }
         }, {
             $pull: {
                 'tokens': {
-                    'token': verificationToken
+                    access,
+                    token
                 }
             }
         }, {
             returnOriginal: false
-        });
+        }
+    );
+
     const obj = doc.value;
     if (!obj) {
         return null;
     }
     obj._id = obj._id.toHexString();
-    return new User(obj);
+    return new User(obj);    
 }
 
 module.exports = {
     generateUniqueId,
     saveUser,
     updateUser,
-    userWithVerificationToken,
+    findUserWithVerificationToken,
+    findUserWithAuthToken,
     findUserWithEmail,
+    removeAuthToken,
     removeVerificationToken
 };

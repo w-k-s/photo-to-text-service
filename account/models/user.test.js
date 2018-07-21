@@ -3,8 +3,14 @@ const expect = require('expect');
 
 const User = require('./user.js');
 const {
+    Token
+} = require('./token.js');
+const {
     ValidationError
-} = require('./../errors')
+} = require('./../errors');
+const {
+    logObj
+} = require('./../../utils');
 
 describe('User', () => {
 
@@ -44,12 +50,14 @@ describe('User', () => {
             expect(user.password).toEqual(userObj.password);
             expect(user.isActive).toEqual(userObj.isActive);
             expect(user.isStaff).toEqual(userObj.isStaff);
-            expect(user.createDate).toEqual(parseInt(userObj.createDate.getTime() / 1000));
+            expect(user.createDate).toEqual(parseInt(userObj.createDate.getTime() /
+                1000));
             expect(user.lastLogin).toBeFalsy();
             expect(user.tokens.length).toEqual(userObj.tokens.length);
             expect(user.tokens[0].access).toEqual(userObj.tokens[0].access);
             expect(user.tokens[0].token).toEqual(userObj.tokens[0].token);
-            expect(user.tokens[0].expiry).toEqual(parseInt(userObj.tokens[0].expiry.getTime() / 1000));
+            expect(user.tokens[0].expiry).toEqual(parseInt(userObj.tokens[0]
+                .expiry.getTime() / 1000));
         })
 
         it('should validate id is optional', () => {
@@ -142,7 +150,8 @@ describe('User', () => {
 
         it('should validate createDate is timestamp', () => {
             const user = new User(userObj);
-            expect(user.createDate).toEqual(parseInt(createDate.getTime() / 1000));
+            expect(user.createDate).toEqual(parseInt(createDate.getTime() /
+                1000));
         });
 
         it('should validate lastLogin is optional', () => {
@@ -184,6 +193,51 @@ describe('User', () => {
         })
     });
 
+    describe('setVerifyEmailToken', () => {
+
+        it('should validate token object', () => {
+
+            const call = () => {
+                const user = new User(userObj);
+                user.setVerifyEmailToken('Token');
+            };
+            expect(call).toThrow();
+
+        });
+
+        it('should validate token access', () => {
+
+            const call = () => {
+                const user = new User(userObj);
+                user.setVerifyEmailToken(new Token({
+                    access: 'auth',
+                    token: '123',
+                    expiry: new Date()
+                }));
+            }
+            expect(call).toThrow();
+
+        });
+
+        it('should replace old verify email token', () => {
+            const tokenString = '324233423';
+            const expiry = new Date();
+
+            const user = new User(userObj);
+            user.setVerifyEmailToken(new Token({
+                access: 'verify',
+                token: tokenString,
+                expiry
+            }));
+
+            const token = user.getVerifyEmailToken();
+            expect(token).toBeTruthy();
+            expect(token.access).toEqual('verify');
+            expect(token.token).toEqual(tokenString);
+            expect(token.expiry).toEqual(parseInt(expiry.getTime() / 1000));
+        });
+    });
+
     describe('getAuthToken', () => {
 
         it('should return token with access type auth', () => {
@@ -192,6 +246,51 @@ describe('User', () => {
             expect(token).toBeTruthy();
             expect(token.access).toEqual('auth');
         })
-    })
+    });
+
+    describe('setAuthToken', () => {
+
+        it('should validate token object', () => {
+
+            const call = () => {
+                const user = new User(userObj);
+                user.setAuthToken('Token');
+            };
+            expect(call).toThrow();
+
+        });
+
+        it('should validate token access', () => {
+
+            const call = () => {
+                const user = new User(userObj);
+                user.setAuthToken(new Token({
+                    access: 'verify',
+                    token: '123',
+                    expiry: new Date()
+                }));
+            }
+            expect(call).toThrow();
+
+        });
+
+        it('should replace old auth token', () => {
+            const tokenString = '324233423';
+            const expiry = new Date();
+
+            const user = new User(userObj);
+            user.setAuthToken(new Token({
+                access: 'auth',
+                token: tokenString,
+                expiry
+            }));
+
+            const token = user.getAuthToken();
+            expect(token).toBeTruthy();
+            expect(token.access).toEqual('auth');
+            expect(token.token).toEqual(tokenString);
+            expect(token.expiry).toEqual(parseInt(expiry.getTime() / 1000));
+        });
+    });
 
 });
