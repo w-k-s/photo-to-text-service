@@ -31,12 +31,14 @@ const {
 
 class LoginController {
 
-    static async login(req, h) {
+    static async login(req, res) {
+        debugger;
         try {
-            const credentials = new LoginCredentials(req.payload);
+            const credentials = new LoginCredentials(req.body);
             const user = await userService.login(credentials);
-            return h.response(new UserResponse(user))
-                    .header('Authorization', user.getAuthToken().token);
+            return res
+                    .header('Authorization', user.getAuthToken().token)
+                    .send(new UserResponse(user));
         } catch (e) {
             let status = 500;
             let resp = new ErrorResponse(domains.account.login.undocumented, e.message);
@@ -56,16 +58,17 @@ class LoginController {
                 status = 401;
             }
 
-            return h.response(resp)
-                .code(status);
+            return res
+                .status(status)
+                .send(resp);
         }
     }
 
-    static async authenticate(req,h){
+    static async authenticate(req,res,next){
         debugger;
         try{
-            const user = await userService.authenticate(req.headers.authorization);
-            return h.authenticated({credentials: new UserResponse(user)});
+            req.user = await userService.authenticate(req.headers.authorization);
+            next();
         }catch(e){
             let status = 500;
             let resp = new ErrorResponse(domains.account.login.undocumented, e.message);
@@ -81,11 +84,13 @@ class LoginController {
                 status = 401;
             }
 
-            return h.unauthenticated()
+            return res
+                    .status(status)
+                    .send(resp);
         }
     }
 
-    static async logout(req, h) {
+    static async logout(req, res) {
         try {
 
         } catch (e) {
@@ -93,7 +98,7 @@ class LoginController {
         }
     }
 
-    static async isAuthenticated(req, h) {
+    static async isAuthenticated(req, res) {
         try {
 
         } catch (e) {
@@ -102,21 +107,4 @@ class LoginController {
     }
 }
 
-module.exports = {
-    authenticate: LoginController.authenticate,
-    login: {
-        method: 'POST',
-        path: '/users/login',
-        handler: LoginController.login,
-        options: {
-            validate: {
-                headers: contentTypeJson
-            }
-        }
-    },
-    logout: {
-        method: 'POST',
-        path: '/users/logout',
-        handler: LoginController.logout
-    }
-}
+module.exports = LoginController;

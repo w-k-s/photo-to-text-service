@@ -1,5 +1,5 @@
 require('./config/config.js')
-const Hapi = require('hapi');
+const express = require('express');
 
 const {
     initDb,
@@ -49,43 +49,34 @@ process.on('uncaughtException', exitHandler.bind(null, {
     cleanup: true
 }));
 
-const server = Hapi.server({
-    address: 'localhost',
-    port: 3000
-})
-
-//-- Set auth strategy
-
-const jwtAuthScheme = function (server, options) {
-    return {
-        authenticate: LoginController.authenticate
-    };
-};
-
-server.auth.scheme('scheme', jwtAuthScheme);
-server.auth.strategy('custom', 'scheme');
-server.auth.default({
-    mode: 'required',
-    strategy: 'custom'
-});
+const app = express();
+app.use(express.json());
 
 //-- Set routes
 
-server.route(HomeController.home);
-server.route(RegistrationController.createUser)
-server.route(RegistrationController.verifyAccount);
-server.route(RegistrationController.resendVerificationCode);
-server.route(LoginController.login);
+const authenticate = LoginController.authenticate;
+
+app.get('/', HomeController.home);
+app.post('/users', RegistrationController.createUser)
+app.get('/users/verify/:token', RegistrationController.verifyAccount);
+app.post('/users/resendVerificationCode', RegistrationController.resendVerificationCode);
+app.post('/users/login', LoginController.login);
+app.post('/users/logout', authenticate, LoginController.logout);
 
 const initServer = async () => {
     await initDb();
     await emailService.initEmailService();
-    await server.start();
+    app.listen(process.env.PORT,()=>{
+        console.log(`Server running at: ${process.env.PORT}`);
+    });
+}
 
-    console.log(`Server running at: ${server.info.uri}`);
+const closeServer = async () => {
+    await app.close();
 }
 
 module.exports = {
-    server,
-    initServer
+    app,
+    initServer,
+    closeServer
 }

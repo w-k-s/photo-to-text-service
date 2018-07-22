@@ -2,15 +2,9 @@
 
 class HomeController {
 
-    static home(request, h) {
-        return `User API`;
+    static home(req, res) {
+        return res.send(`User API`);
     }
 }
 
-module.exports = {
-    home: {
-        method: 'GET',
-        path: '/',
-        handler: HomeController.home
-    }
-}
+module.exports = HomeController;

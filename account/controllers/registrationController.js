@@ -28,14 +28,15 @@ const {
 
 class RegistrationController {
 
-    static async createUser(req, h) {
-        const body = _.pick(req.payload, ['email', 'password', 'firstName', 'lastName']);
+    static async createUser(req, res) {
+        const body = _.pick(req.body, ['email', 'password', 'firstName', 'lastName']);
         try {
             const user = await userService.createUser(body);
             RegistrationController.sendVerificationEmail(req, user);
 
-            return h.response(new UserResponse(user))
-                .code(201)
+            return res.status(201)
+                    .send(new UserResponse(user))
+                
         } catch (e) {
             let status = 500;
             let resp = new ErrorResponse(domains.account.registration.undocumented, e.message);
@@ -48,16 +49,17 @@ class RegistrationController {
                 status = 400;
             }
 
-            return h.response(resp)
-                .code(status);
+            return res.status(status)
+                    .send(resp);
+                
         }
     }
 
-    static async verifyAccount(req, h, err) {
+    static async verifyAccount(req, res) {
         try {
             const verificationToken = req.params.token;
             const user = await userService.verifyUser(verificationToken);
-            return new UserResponse(user);
+            return res.send(new UserResponse(user));
         } catch (e) {
             logObj('Error on verifyAccount', e);
             let status = 500;
@@ -74,17 +76,17 @@ class RegistrationController {
                 status = 400;
             }
 
-            return h.response(resp)
-                .code(status);
+            return res.status(status)
+                    .send(resp);
         }
     }
 
-    static async resendVerificationCode(req, h, err) {
+    static async resendVerificationCode(req, res) {
         try {
-            const resendRequest = new VerificationCodeRequest(req.payload);
+            const resendRequest = new VerificationCodeRequest(req.body);
             const user = await userService.recreateVerificationCode(resendRequest);
             RegistrationController.sendVerificationEmail(req, user);
-            return new UserResponse(user);
+            return res.send(new UserResponse(user));
         } catch (e) {
             let status = 500;
             let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
@@ -100,8 +102,8 @@ class RegistrationController {
                 status = 400;
             }
 
-            return h.response(resp)
-                .code(status);
+            return res.status(status)
+                    .send(resp);
         }
     }
 
@@ -121,38 +123,13 @@ class RegistrationController {
     }
 
     static verificationUrl(req, verifyEmailToken) {
+
         const scheme = 'http';
-        const host = req.info.host;
+        const host = req.hostname;
         const path = `/users/verify/${verifyEmailToken}`;
 
         return `${scheme}://${host}${path}`;
     }
 }
 
-module.exports = {
-    createUser: {
-        method: 'POST',
-        path: '/users',
-        handler: RegistrationController.createUser,
-        options: {
-            validate: {
-                headers: contentTypeJson
-            }
-        }
-    },
-    verifyAccount: {
-        method: 'GET',
-        path: '/users/verify/{token}',
-        handler: RegistrationController.verifyAccount
-    },
-    resendVerificationCode: {
-        method: 'POST',
-        path: '/users/resendVerificationCode',
-        handler: RegistrationController.resendVerificationCode,
-        options: {
-            validate: {
-                headers: contentTypeJson
-            }
-        }
-    }
-}
+module.exports = RegistrationController;

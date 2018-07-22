@@ -442,7 +442,7 @@ describe('UserService', () => {
                 name = e.name;
             }
 
-            expect(name).toEqual('AccountNotFoundError');
+            expect(name).toEqual('UnauthorizedAccessError');
         });
 
         it('should throw AccountNotVerifiedError if account found but not active',async ()=>{

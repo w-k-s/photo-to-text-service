@@ -5,7 +5,7 @@ const request = require('supertest');
 
 require('./../../config/config.js');
 const {
-    server,
+    app,
     initServer
 } = require('./../../server.js');
 const {
@@ -48,7 +48,7 @@ describe('RegistrationController', () => {
         it('should return 400 if email is not sent', (done) => {
 
             delete body.email;
-            request(server.listener)
+            request(app)
                 .post('/users')
                 .set('content-type', 'application/json')
                 .send(body)
@@ -64,7 +64,7 @@ describe('RegistrationController', () => {
         it('should return 400 if password is not sent', (done) => {
 
             delete body.password
-            request(server.listener)
+            request(app)
                 .post('/users')
                 .set('content-type', 'application/json')
                 .send(body)
@@ -80,7 +80,7 @@ describe('RegistrationController', () => {
         it('should return 400 if password is weak', (done) => {
 
             body.password = '123456'
-            request(server.listener)
+            request(app)
                 .post('/users')
                 .set('content-type', 'application/json')
                 .send(body)
@@ -96,7 +96,7 @@ describe('RegistrationController', () => {
         it('should return 400 if firstName is not sent', (done) => {
 
             delete body.firstName
-            request(server.listener)
+            request(app)
                 .post('/users')
                 .set('content-type', 'application/json')
                 .send(body)
@@ -112,7 +112,7 @@ describe('RegistrationController', () => {
         it('should return 400 if lastName is not sent', (done) => {
 
             delete body.lastName
-            request(server.listener)
+            request(app)
                 .post('/users')
                 .set('content-type', 'application/json')
                 .send(body)
@@ -128,7 +128,7 @@ describe('RegistrationController', () => {
         it('should return 400 if account already exists', (done) => {
 
             userService.createUser(body).then(() => {
-                request(server.listener)
+                request(app)
                     .post('/users')
                     .set('content-type', 'application/json')
                     .send(body)
@@ -145,7 +145,7 @@ describe('RegistrationController', () => {
 
         it('should return 201 and user without tokens and passwords if user created successfully', (done) => {
 
-            request(server.listener)
+            request(app)
                 .post('/users')
                 .set('content-type', 'application/json')
                 .send(body)
@@ -194,7 +194,7 @@ describe('RegistrationController', () => {
         it('should return 404 if token not found', (done) => {
 
             const nonExistingToken = "null"
-            request(server.listener)
+            request(app)
                 .get(`/users/verify/${nonExistingToken}`)
                 .set('content-type', 'application/json')
                 .send(body)
@@ -225,7 +225,7 @@ describe('RegistrationController', () => {
                         }
                     }]
                 }).then(() => {
-                    request(server.listener)
+                    request(app)
                         .get(`/users/verify/${invalidTokenValue}`)
                         .set('content-type', 'application/json')
                         .send(body)
@@ -249,7 +249,7 @@ describe('RegistrationController', () => {
                         'isActive': true
                     }
                 }).then(() => {
-                    request(server.listener)
+                    request(app)
                         .get(`/users/verify/${user.getVerifyEmailToken().token}`)
                         .set('content-type', 'application/json')
                         .send(body)
@@ -265,7 +265,7 @@ describe('RegistrationController', () => {
 
         it('should return 200 and user without tokens and passwords if verification successful', (done) => {
 
-            request(server.listener)
+            request(app)
                 .get(`/users/verify/${user.getVerifyEmailToken().token}`)
                 .set('content-type', 'application/json')
                 .send(body)
@@ -313,7 +313,7 @@ describe('RegistrationController', () => {
         it('should return 400 if body does not contain email', (done) => {
 
             const nonExistingToken = "null"
-            request(server.listener)
+            request(app)
                 .post(`/users/resendVerificationCode`)
                 .set('content-type', 'application/json')
                 .send({})
@@ -332,7 +332,7 @@ describe('RegistrationController', () => {
                 'email': `${nonExistingEmail}`
             };
 
-            request(server.listener)
+            request(app)
                 .post('/users/resendVerificationCode')
                 .set('content-type', 'application/json')
                 .send(body)
@@ -355,7 +355,7 @@ describe('RegistrationController', () => {
                         'isActive': true
                     }
                 }).then(() => {
-                    request(server.listener)
+                    request(app)
                         .post(`/users/resendVerificationCode`)
                         .set('content-type', 'application/json')
                         .send({
@@ -373,7 +373,7 @@ describe('RegistrationController', () => {
 
         it('should return 200 and user without tokens and passwords if verification successful', (done) => {
 
-            request(server.listener)
+            request(app)
                 .post(`/users/resendVerificationCode`)
                 .set('content-type', 'application/json')
                 .send({email: body.email})
