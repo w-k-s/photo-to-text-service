@@ -333,16 +333,17 @@ describe('UserService', () => {
             user = await userService.createUser(obj);
         });
 
-        it('should throw AccountNotFoundError if user with token not found', async () => {
+        it('should throw TokenNotFoundError if user with token not found', async () => {
             
             let name;
             try {
                 await userService.verifyUser('token');
             } catch (e) {
+                logObj('e',e);
                 name = e.name;
             }
 
-            expect(name).toEqual('AccountNotFoundError');
+            expect(name).toEqual('TokenNotFoundError');
         });
 
         it('should throw ReverifyingActiveAccountError if account already active',
@@ -409,7 +410,6 @@ describe('UserService', () => {
             });
 
     });
-
 
     describe('authenticate',()=>{
 
@@ -503,6 +503,34 @@ describe('UserService', () => {
             expect(authUser._id).toBeTruthy();
             expect(authUser.email).toEqual(obj.email);
             expect(authUser.isActive).toBeTruthy();
+        });
+    });
+
+    describe('logout',()=>{
+
+        let user;
+
+        beforeEach(async () => {
+            debugger;
+            user = await userService.createUser(obj);
+            user = await userService.verifyUser(user.getVerifyEmailToken().token);
+            user = await userService.login(new LoginCredentials({email: obj.email, password: obj.password}));
+        });
+
+        afterEach(async () => {
+            await getDb().collection(usersCollection).remove({});
+        });
+
+        it('should remove auth token from db',async ()=>{
+            const token = user.getAuthToken().token;
+
+            const before = await getDb().collection(usersCollection).count({'tokens':{$elemMatch: {token}}});
+
+            const authUser = await userService.logout(user.getAuthToken().token);
+            
+            const after = await getDb().collection(usersCollection).count({'tokens':{$elemMatch: {token}}})
+
+            expect(after).toEqual(before - 1);
         });
     });
 });

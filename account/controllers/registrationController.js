@@ -23,6 +23,7 @@ const {
     DuplicateAccountError,
     InvalidTokenError,
     AccountNotFoundError,
+    TokenNotFoundError,
     ReverifyingActiveAccountError
 } = require('./../errors');
 
@@ -65,8 +66,8 @@ class RegistrationController {
             let status = 500;
             let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
 
-            if (e instanceof AccountNotFoundError) {
-                resp = new ErrorResponse(domains.account.verification.accountNotFound, e.message)
+            if (e instanceof TokenNotFoundError) {
+                resp = new ErrorResponse(domains.account.verification.tokenNotFound, e.message)
                 status = 404;
             } else if (e instanceof InvalidTokenError) {
                 resp = new ErrorResponse(domains.account.verification.tokenNotValid, e.message)

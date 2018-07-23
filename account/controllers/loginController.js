@@ -22,6 +22,7 @@ const {
 
 const {
     ValidationError,
+    InvalidTokenError,
     IncorrectPasswordError,
     UnauthorizedAccessError,
     AccountNotFoundError,
@@ -74,7 +75,7 @@ class LoginController {
             let resp = new ErrorResponse(domains.account.login.undocumented, e.message);
 
             if (e instanceof UnauthorizedAccessError) {
-                resp = new ErrorResponse(domains.account.login.unauthorizedAccess, 'Invalid or empty Authorization token');
+                resp = new ErrorResponse(domains.account.login.unauthorizedAccess, 'Token is missing or unauthorized');
                 status = 401;
             } else if (e instanceof AccountNotVerifiedError) {
                 resp = new ErrorResponse(domains.account.login.accountUnverified, 'Account not activated');
@@ -91,10 +92,13 @@ class LoginController {
     }
 
     static async logout(req, res) {
-        try {
-
-        } catch (e) {
-
+        try{
+            await userService.logout(req.user.getAuthToken().token);
+            res.send(204);
+        }catch(e){
+            res
+                .status(500)
+                .send(new ErrorResponse(domains.account.login.undocumented,e));
         }
     }
 

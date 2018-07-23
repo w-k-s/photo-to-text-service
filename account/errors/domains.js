@@ -23,13 +23,17 @@ const domains = {
                 code: 12010,
                 path: 'account.verification.validation',
             },
-            accountNotFound: {
+            tokenNotFound: {
                 code: 12020,
-                path: 'account.verification.accountNotFound'
+                path: 'account.verification.tokenNotFound'
             },
             tokenNotValid: {
-                code: 12040,
+                code: 12030,
                 path: 'account.verification.tokenNotValid'
+            },
+            accountNotFound: {
+                code: 12040,
+                path: 'account.verification.tokenNotFound'
             },
             accountAlreadyActive: {
                 code: 12050,

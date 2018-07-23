@@ -30,5 +30,13 @@
     "test-debug": "export \"NODE_ENV=test\" || SET \"NODE_ENV=test\" && mocha --inspect-brk --exit account/**/*.test.js"
   },
   "author": "W.K.S",
-  "license": "ISC"
+  "license": "ISC",
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text",
+      "html"
+    ],
+    "report-dir": "coverage"
+  }
 }

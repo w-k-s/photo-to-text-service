@@ -21,11 +21,11 @@ This project was supposed to be a mono repository but
 
 ##### POST users/login
 
-- [ ] returns jwt token given email, password
+- [x] returns jwt token given email, password
 
-##### DELETE /users/me/token
+##### DELETE /users/logout
 
-- [ ] logs out user
+- [x] logs out user
 
 ##### GET /users/me (authenticated)
 
@@ -38,8 +38,8 @@ This project was supposed to be a mono repository but
 - [x] Single db instance
 - [x] Close db
 - [x] Unit Test for Services & Controllers
-- [ ] Login
-- [ ] Logout
+- [x] Login
+- [x] Logout
 - [ ] Localize
 - [ ] Message Queues
 

@@ -200,8 +200,8 @@ describe('RegistrationController', () => {
                 .send(body)
                 .expect(404, (err, resp) => {
                     const errorResponse = JSON.parse(resp.text);
-                    expect(errorResponse.code).toBe(domains.account.verification.accountNotFound.code);
-                    expect(errorResponse.path).toBe(domains.account.verification.accountNotFound.path);
+                    expect(errorResponse.code).toBe(domains.account.verification.tokenNotFound.code);
+                    expect(errorResponse.path).toBe(domains.account.verification.tokenNotFound.path);
                     done();
                 });
         });

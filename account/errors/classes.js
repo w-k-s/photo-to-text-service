@@ -20,6 +20,8 @@ class WeakPasswordError extends ValidationError {}
 
 class IncorrectPasswordError extends BaseError {}
 
+class TokenNotFoundError extends BaseError {}
+
 class InvalidTokenError extends BaseError {}
 
 class AccountNotFoundError extends BaseError {}
@@ -34,6 +36,7 @@ module.exports = {
     ValidationError,
     DuplicateAccountError,
     WeakPasswordError,
+    TokenNotFoundError,
     InvalidTokenError,
     UnauthorizedAccessError,
     IncorrectPasswordError,

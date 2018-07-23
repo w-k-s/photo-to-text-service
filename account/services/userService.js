@@ -21,6 +21,7 @@ const {
     ValidationError,
     WeakPasswordError,
     IncorrectPasswordError,
+    TokenNotFoundError,
     InvalidTokenError,
     AccountNotFoundError,
     AccountNotVerifiedError,
@@ -111,10 +112,11 @@ const comparePasswords = async (plainPassword, encryptedPassword) => {
 }
 
 const verifyUser = async (verificationToken) => {
+
     let user = await userRepository.findUserWithVerificationToken(
         verificationToken);
     if (!user) {
-        throw new AccountNotFoundError();
+        throw new TokenNotFoundError();
     }
     if (user.isActive) {
         throw new ReverifyingActiveAccountError();
@@ -157,27 +159,6 @@ const login = async (loginCredentials) => {
     return await userRepository.updateUser(user);
 }
 
-const authenticate = async (authorization) => {
-
-    const user = await userRepository.findUserWithAuthToken(authorization);
-    if (!user) {
-        throw new UnauthorizedAccessError();
-    }
-
-    if (!user.isActive) {
-        throw new AccountNotVerifiedError();
-    }
-
-    try {
-        jwt.verify(user.getAuthToken().token, jwtSignature);
-    } catch (e) {
-        //TODO: logout
-        throw new InvalidTokenError(e);
-    }
-
-    return user;
-}
-
 const generateAuthToken = (id) => {
     const token = jwt.sign({
         id: id
@@ -195,8 +176,36 @@ const generateAuthToken = (id) => {
     });
 }
 
-const logout = async (authToken) => {
+const authenticate = async (authorization) => {
 
+    const user = await userRepository.findUserWithAuthToken(authorization);
+    if (!user) {
+        throw new UnauthorizedAccessError();
+    }
+
+    if (!user.isActive) {
+        throw new AccountNotVerifiedError();
+    }
+
+    try {
+        jwt.verify(user.getAuthToken().token, jwtSignature);
+    } catch (e) {
+        logout(authorization);
+        throw new InvalidTokenError(e);
+    }
+
+    return user;
+}
+
+const logout = async (authToken) => {
+    try{
+        await userRepository.removeAuthToken(authToken);
+    }catch(e){
+        //If logging out with expired jwt token, ignore the error.
+        if(!(e instanceof InvalidTokenError)){
+            throw e;
+        }
+    }
 }
 
 module.exports = {

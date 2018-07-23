@@ -18,37 +18,6 @@ const {
     emailService
 } = require('./account/services');
 
-function exitHandler(options, err) {
-    if (err) {
-        console.log(err.stack);
-    }
-    if (options.cleanup) {
-        console.log('Cleaning...');
-        closeDb();
-    }
-    if (options.exit) {
-        console.log('Exiting');
-        process.exit();
-    }
-}
-
-process.on('SIGINT', exitHandler.bind(null, {
-    exit: true,
-    cleanup: true
-}));
-process.on('SIGUSR1', exitHandler.bind(null, {
-    exit: true,
-    cleanup: true
-}));
-process.on('SIGUSR2', exitHandler.bind(null, {
-    exit: true,
-    cleanup: true
-}));
-process.on('uncaughtException', exitHandler.bind(null, {
-    exit: true,
-    cleanup: true
-}));
-
 const app = express();
 app.use(express.json());
 
@@ -63,6 +32,8 @@ app.post('/users/resendVerificationCode', RegistrationController.resendVerificat
 app.post('/users/login', LoginController.login);
 app.post('/users/logout', authenticate, LoginController.logout);
 
+//-- Init
+
 const initServer = async () => {
     await initDb();
     await emailService.initEmailService();
@@ -71,9 +42,28 @@ const initServer = async () => {
     });
 }
 
+//-- Exit
+
 const closeServer = async () => {
     await app.close();
 }
+
+function exitHandler() {
+
+    console.log('Cleaning...');
+    closeDb();
+
+    console.log('Exiting...');
+    process.exit();
+
+}
+
+process.on('SIGINT', exitHandler.bind(null));
+process.on('SIGUSR1', exitHandler.bind(null));
+process.on('SIGUSR2', exitHandler.bind(null));
+process.on('uncaughtException', exitHandler.bind(null));
+
+//-- Exports
 
 module.exports = {
     app,
