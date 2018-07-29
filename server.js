@@ -18,6 +18,7 @@ const {
     emailService
 } = require('./account/services');
 
+let server;
 const app = express();
 app.use(express.json());
 
@@ -37,6 +38,7 @@ app.post('/users/logout', authenticate, LoginController.logout);
 const initServer = async () => {
     await initDb();
     await emailService.initEmailService();
+    server = require('http').createServer(app);
     app.listen(process.env.PORT,()=>{
         console.log(`Server running at: ${process.env.PORT}`);
     });
@@ -45,7 +47,7 @@ const initServer = async () => {
 //-- Exit
 
 const closeServer = async () => {
-    await app.close();
+    await server.close();
 }
 
 function exitHandler() {
@@ -61,7 +63,7 @@ function exitHandler() {
 process.on('SIGINT', exitHandler.bind(null));
 process.on('SIGUSR1', exitHandler.bind(null));
 process.on('SIGUSR2', exitHandler.bind(null));
-process.on('uncaughtException', exitHandler.bind(null));
+//process.on('uncaughtException', exitHandler.bind(null));
 
 //-- Exports
 

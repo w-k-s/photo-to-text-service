@@ -47,7 +47,6 @@ class LoginController {
             if (e instanceof ValidationError) {
                 resp = new ErrorResponse(domains.account.login.validation, undefined, e.fields)
                 status = 400;
-
             } else if (e instanceof AccountNotFoundError) {
                 resp = new ErrorResponse(domains.account.login.accountNotFound, e.message)
                 status = 404;
@@ -99,14 +98,6 @@ class LoginController {
             res
                 .status(500)
                 .send(new ErrorResponse(domains.account.login.undocumented,e));
-        }
-    }
-
-    static async isAuthenticated(req, res) {
-        try {
-
-        } catch (e) {
-
         }
     }
 }
