@@ -33,7 +33,7 @@ const {
 class LoginController {
 
     static async login(req, res) {
-        debugger;
+    
         try {
             const credentials = new LoginCredentials(req.body);
             const user = await userService.login(credentials);
@@ -91,9 +91,10 @@ class LoginController {
     }
 
     static async logout(req, res) {
+        debugger;
         try{
             await userService.logout(req.user.getAuthToken().token);
-            res.send(204);
+            res.sendStatus(204);
         }catch(e){
             res
                 .status(500)
