@@ -14,9 +14,7 @@ const {
     HomeController
 } = require('./account/controllers');
 
-const {
-    emailService
-} = require('./account/services');
+const emailService = require('./services');
 
 let server;
 const app = express();
@@ -37,7 +35,7 @@ app.post('/users/logout', authenticate, LoginController.logout);
 
 const initServer = async () => {
     await initDb();
-    await emailService.initEmailService();
+    await emailService.start();
     server = require('http').createServer(app);
     app.listen(process.env.PORT,()=>{
         console.log(`Server running at: ${process.env.PORT}`);
@@ -47,6 +45,7 @@ const initServer = async () => {
 //-- Exit
 
 const closeServer = async () => {
+    await emailService.close();
     await server.close();
 }
 

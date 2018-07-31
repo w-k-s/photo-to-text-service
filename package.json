@@ -4,6 +4,7 @@
   "description": "Microservice for authenticating users",
   "main": "app.js",
   "dependencies": {
+    "amqplib": "0.5.2",
     "app": "^0.1.0",
     "bcrypt": "2.0.1",
     "expect": "^23.3.0",
