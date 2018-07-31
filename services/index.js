@@ -11,6 +11,6 @@ module.exports.close = () => {
 	emailSender.close();
 }
 
-module.exports.sendEmail = (mailOptions) => {
+module.exports.queueEmail = (mailOptions) => {
 	emailQueuer.sendEmail(mailOptions);
 }

@@ -11,8 +11,8 @@ const {
 } = require('./../models');
 const {
     userService,
-    emailService
 } = require('./../services');
+const emailService = require('./../../services');
 const {
     contentTypeJson
 } = require('./validation.js');
@@ -113,10 +113,9 @@ class RegistrationController {
         const verifyEmailToken = user.getVerifyEmailToken().token;
         const verifyEmailLink = RegistrationController.verificationUrl(req, verifyEmailToken);
 
-        //TODO: use message queue, and use template
         const message = `<p><a href="${verifyEmailLink}">Verify</a> your email<p>`;
         console.log(message);
-        await emailService.sendEmail({
+        await emailService.queueEmail({
             to: user.email,
             subject: 'Verify your account',
             html: message
@@ -125,8 +124,10 @@ class RegistrationController {
 
     static verificationUrl(req, verifyEmailToken) {
 
+        let port = process.env.PORT === '80'? '' : `:${process.env.PORT}`;
+
         const scheme = 'http';
-        const host = req.hostname;
+        const host = `${req.hostname}${port}`;
         const path = `/users/verify/${verifyEmailToken}`;
 
         return `${scheme}://${host}${path}`;

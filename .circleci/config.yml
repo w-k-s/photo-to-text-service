@@ -8,6 +8,9 @@ jobs:
     docker: 
       - image: "circleci/node:10.5.0"
       - image: "circleci/mongo:3.6.0"
+      - image: brandembassy/rabbitmq:latest
+        ports:
+          - "5672:5672"
     steps: 
       - checkout
       - run:
