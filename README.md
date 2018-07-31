@@ -1,6 +1,12 @@
 This project was supposed to be a mono repository but 
 
-### 1. Routes
+### 1. Project Goals
+
+- [x] Use Message Queue
+- [] Use gRPC
+- [] Host Microservice
+
+### 2. Routes
 
 ##### POST /users
 
@@ -31,7 +37,7 @@ This project was supposed to be a mono repository but
 
 - [ ] returns user
 
-### 2. Todo
+### 3. Todo
 
 - [x] Encrypt password
 - [x] Helpful password error mesaage
@@ -41,7 +47,7 @@ This project was supposed to be a mono repository but
 - [x] Login
 - [x] Logout
 - [ ] Localize
-- [ ] Message Queues
+- [x] Message Queues
 
 ### 3. References
 
