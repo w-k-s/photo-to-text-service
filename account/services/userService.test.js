@@ -339,7 +339,6 @@ describe('UserService', () => {
             try {
                 await userService.verifyUser('token');
             } catch (e) {
-                logObj('e',e);
                 name = e.name;
             }
 

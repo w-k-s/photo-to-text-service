@@ -44,7 +44,7 @@ describe('loginController',()=>{
 
 	describe('login',()=>{
 
-		it('Given credentials are correct, When logging in, Then Authorization header is set',(done)=>{
+		it('should set authorization header if credentials are correct',(done)=>{
 
 			request(app)
 				.post('/users/login')
@@ -59,7 +59,7 @@ describe('loginController',()=>{
 		
 		});
 
-		it('Given credentials are incorrect, When logging in, Then IncorrectPasswordError is returned',(done)=>{
+		it('should return invalid credentials if credentials are incorrect',(done)=>{
 
 			credentials.password = 'null';
 
@@ -74,7 +74,7 @@ describe('loginController',()=>{
 
 		});
 
-		it('Given credentials are invalid, When logging in, Then ValidationError is returned',(done)=>{
+		it('should return validation error if credentials are invalid',(done)=>{
 
 			delete credentials.password;
 
@@ -89,7 +89,7 @@ describe('loginController',()=>{
 
 		});
 
-		it('Given credentials do not exist, When logging in, Then AccountNotFound is returned',(done)=>{
+		it('should return account not found if credentials dont exist',(done)=>{
 
 			credentials.email = 'null@null.com';
 
@@ -104,7 +104,7 @@ describe('loginController',()=>{
 
 		});
 
-		it('Given account not verified, When logging in, Then AccountNotVerified is returned',(done)=>{
+		it('should return account not verified if credentials exist but account not verified',(done)=>{
 
 			getDb()
 				.collection(usersCollections)
@@ -124,4 +124,65 @@ describe('loginController',()=>{
 
 	});
 
+	describe('logout',()=>{
+
+		let token;
+
+		beforeEach(async ()=>{
+			user = await userService.login(credentials);
+			token = user.getAuthToken().token;
+		});
+
+		it('should delete token of logged out user',(done)=>{
+
+			request(app)
+				.post('/users/logout')
+				.set('Authorization',token)
+				.send()
+				.expect(204)
+				.end((err,resp)=>{
+					if(err){
+						return done(err);
+					}
+					done();
+				});
+
+		});
+
+		it('should return authorization error if user not logged in',(done)=>{
+
+			request(app)
+				.post('/users/logout')
+				.send()
+				.expect(401)
+				.end((err,resp)=>{
+					if(err){
+						return done(err);
+					}
+
+					const errorResponse = JSON.parse(resp.text);
+					expect(errorResponse.code).toBe(domains.account.login.unauthorizedAccess.code);
+					done();
+				});
+		});
+
+		it('should return error if token does not exist',(done)=>{
+
+			request(app)
+				.post('/users/logout')
+				.set('Authorization','null')
+				.send()
+				.expect(401)
+				.end((err,resp)=>{
+					if(err){
+						return done(err);
+					}
+
+					const errorResponse = JSON.parse(resp.text);
+					expect(errorResponse.code).toBe(domains.account.login.unauthorizedAccess.code);
+					done();
+				});
+
+		});
+	});
 });

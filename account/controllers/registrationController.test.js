@@ -254,7 +254,6 @@ describe('RegistrationController', () => {
                         .set('content-type', 'application/json')
                         .send(body)
                         .expect(400, (err, resp) => {
-                            logObj('resp.text', resp.text);
                             const errorResponse = JSON.parse(resp.text);
                             expect(errorResponse.code).toBe(domains.account.verification.accountAlreadyActive.code);
                             expect(errorResponse.path).toBe(domains.account.verification.accountAlreadyActive.path);
@@ -362,7 +361,6 @@ describe('RegistrationController', () => {
                             email: body.email
                         })
                         .expect(400, (err, resp) => {
-                            logObj('resp.text', resp.text);
                             const errorResponse = JSON.parse(resp.text);
                             expect(errorResponse.code).toBe(domains.account.verification.accountAlreadyActive.code);
                             expect(errorResponse.path).toBe(domains.account.verification.accountAlreadyActive.path);

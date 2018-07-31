@@ -49,7 +49,13 @@ const closeServer = async () => {
     await server.close();
 }
 
-function exitHandler() {
+function exitHandler(err) {
+
+    if(err){
+        console.log(`Shutting down with error:\n`);
+        console.log(err);
+        console.log('\n');
+    }
 
     console.log('Cleaning...');
     closeDb();
@@ -62,7 +68,7 @@ function exitHandler() {
 process.on('SIGINT', exitHandler.bind(null));
 process.on('SIGUSR1', exitHandler.bind(null));
 process.on('SIGUSR2', exitHandler.bind(null));
-//process.on('uncaughtException', exitHandler.bind(null));
+process.on('uncaughtException', exitHandler.bind(null));
 
 //-- Exports
 

@@ -62,7 +62,7 @@ class RegistrationController {
             const user = await userService.verifyUser(verificationToken);
             return res.send(new UserResponse(user));
         } catch (e) {
-            logObj('Error on verifyAccount', e);
+
             let status = 500;
             let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
 
