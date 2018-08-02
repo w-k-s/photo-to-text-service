@@ -8,12 +8,12 @@ module.exports = {
     closeDb
 };
 async function initDb() {
-    console.log(`Connecting to ${process.env.MONGODB_URI} ${process.env.MONGODB_NAME}\n`);
+    console.log(`db:\tConnecting to ${process.env.MONGODB_URI} ${process.env.MONGODB_NAME}`);
     _client = await mongodb.connect(process.env.MONGODB_URI, {
         useNewUrlParser: true
     });
     _db = _client.db(process.env.MONGODB_NAME);
-    console.log(`Connected to mongodb: ${_client.isConnected()}`);
+    console.log(`db:\tconnected: ${_client.isConnected()}`);
 }
 
 function getDb() {
@@ -26,8 +26,7 @@ function getClient() {
 
 function closeDb() {
     if (_client) {
-        console.log(`Closing client`);
         _client.close();
-        console.log(`Connected to mongodb: ${_client.isConnected()}`);
+        console.log(`db:\tConnected: ${_client.isConnected()}`);
     }
 }

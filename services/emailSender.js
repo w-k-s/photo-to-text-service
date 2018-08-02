@@ -24,12 +24,12 @@ module.exports.start = async () => {
         channel.assertQueue(queue,{durable: false});
         beginProcessing(channel);
     }catch(e){
-        console.log(`Error starting subscribing queue: ${prettyJSON(e)}`);
+        console.log(`emailSender:\tError starting queue: ${prettyJSON(e)}`);
     }
 }
 
 const setupTransport = async () => {
-    console.log(`Setting up email transport`);
+    console.log(`emailSender:\tSetting up transport`);
     const account = {
         user: emailUser,
         pass: emailPassword
@@ -48,11 +48,11 @@ const setupTransport = async () => {
             pass: account.pass
         }
     });
-    console.log(`Email transport setup complete`);
+    console.log(`emailSender:\ttransport setup complete`);
 }
 
 const beginProcessing = (channel)=>{
-	console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
+	console.log(`emailSender:\tWaiting for messages in queue: '${queue}'`);
 	try{
 		channel.consume(queue, async function(msg) {
             const content = msg.content.toString();
@@ -61,7 +61,7 @@ const beginProcessing = (channel)=>{
             await sendEmail(mailOptions);
 		}, {noAck: true});
 	}catch(e){
-		console.log(`Error processing queue: ${prettyJSON(e)}`);
+		console.log(`emailSender:\tError processing queue: ${prettyJSON(e)}`);
 	}
 }
 
@@ -69,7 +69,7 @@ const sendEmail = async (mailOptions) => {
     mailOptions.from = 'App Email <app@email.com>'
     const info = await transport.sendMail(mailOptions)
     if (process.env.NODE_ENV !== "production") {
-        console.log(`email link: ${nodemailer.getTestMessageUrl(info)}`)
+        console.log(`emailSender:\tpreview: ${nodemailer.getTestMessageUrl(info)}`)
     }
     return info;
 }
@@ -77,7 +77,8 @@ const sendEmail = async (mailOptions) => {
 module.exports.close = () => {
 	try{
         conn.close();
+        console.log(`emailSender:\tExited`);
     }catch(e){
-        console.log(`Error closing subscribing queue: ${prettyJSON(e)}`);
+        console.log(`emailSender:\tError closing subscribing queue: ${prettyJSON(e)}`);
     }
 }

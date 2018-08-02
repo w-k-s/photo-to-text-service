@@ -15,7 +15,7 @@ const start = async () => {
         channel = await conn.createChannel();
         channel.assertQueue(queue,{durable: false});
     }catch(e){
-        console.log(`Error starting publishing queue: ${prettyJSON(e)}`);
+        console.log(`emailQueuer:\tError starting queue: ${prettyJSON(e)}`);
     }
 }
 
@@ -27,8 +27,9 @@ const sendEmail = async (mailOptions) => {
 const close = async () => {
     try{
         conn.close();
+        console.log(`emailQueuer:\tExited`);
     }catch(e){
-        console.log(`Error closing publishing queue: ${prettyJSON(e)}`);
+        console.log(`emailQueuer:\tError closing queue: ${prettyJSON(e)}`);
     }
 }
 

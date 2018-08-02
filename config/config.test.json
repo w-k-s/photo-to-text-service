@@ -6,9 +6,12 @@
     "AUTH_EXP_SECONDS": 3600,
     "EMAIL_VERIFICATION_EXP_SECONDS": 432000,
     "SALT_ROUNDS": 10,
+    "EMAIL_QUEUE_ADDRESS": "amqp://localhost:5672",
+    "EMAIL_QUEUE_NAME":"com.w-k-s.queue.email",
     "EMAILSERVICE_HOST": "smtp.ethereal.email",
     "EMAILSERVICE_PORT": 587,
     "EMAILSERVICE_SECURE": false,
     "EMAILSERVICE_USER": null,
-    "EMAILSERVICE_PASS": null
+    "EMAILSERVICE_PASS": null,
+    "RPC_SERVER_AUTH_ADDRESS": "0.0.0.0:50050"
 }

@@ -15,6 +15,7 @@ const {
 } = require('./account/controllers');
 
 const emailService = require('./services');
+const authenticationRPCService = require('./account/services').authenticationService;
 
 let server;
 const app = express();
@@ -36,31 +37,31 @@ app.post('/users/logout', authenticate, LoginController.logout);
 const initServer = async () => {
     await initDb();
     await emailService.start();
+    authenticationRPCService.start();
     server = require('http').createServer(app);
     app.listen(process.env.PORT,()=>{
-        console.log(`Server running at: ${process.env.PORT}`);
+        console.log(`app:\tServer running at: ${process.env.PORT}`);
     });
 }
 
 //-- Exit
 
 const closeServer = async () => {
-    await emailService.close();
+    closeDb();
+    emailService.close();
     await server.close();
 }
 
 function exitHandler(err) {
 
     if(err){
-        console.log(`Shutting down with error:\n`);
-        console.log(err);
-        console.log('\n');
+        console.log(`app:\tShutting down with error: ${err}`);
     }
 
-    console.log('Cleaning...');
-    closeDb();
+    console.log('app:\tExiting...:');
+    closeServer();
 
-    console.log('Exiting...');
+    console.log('app:\tExited');
     process.exit();
 
 }

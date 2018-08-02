@@ -1,10 +1,11 @@
-This project was supposed to be a mono repository but 
+# Photo to Text
+## The Authentication Microservice
 
 ### 1. Project Goals
 
-- [x] Use Message Queue
-- [] Use gRPC
-- [] Host Microservice
+- [x] Use Message Queues 
+- [x] Use gRPC
+- [ ] Hosting microservice for as little as possible
 
 ### 2. Routes
 
@@ -52,3 +53,4 @@ This project was supposed to be a mono repository but
 ### 3. References
 
 - [How to use arguments and parameters in ecmascript](https://www.smashingmagazine.com/2016/07/how-to-use-arguments-and-parameters-in-ecmascript-6/)
+- [Implementing remote procedure calls with gRPC and protocol buffers](https://scotch.io/tutorials/implementing-remote-procedure-calls-with-grpc-and-protocol-buffers)

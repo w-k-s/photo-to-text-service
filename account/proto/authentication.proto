@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package authentication;
+
+service ValidateAuthenticationService{
+	rpc isAuthTokenValid(Token) returns (User);
+}
+
+message Token{
+	string token = 1;
+}
+
+message User{
+	string id = 1;
+	string email = 2;
+	string firstName = 3;
+	string lastName = 4;
+	bool isActive = 5;
+	bool isStaff = 6;
+	int64 createDate = 7;
+	int64 lastLogin = 8;
+}
