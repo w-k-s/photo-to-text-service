@@ -39,6 +39,11 @@ const domains = {
                 code: 12050,
                 path: 'account.verification.accountAlreadyActive'
             },
+            verificationCodeNotSent: {
+                code: 12060,
+                path: 'account.registration.verificationCodeNotSent',
+                message: 'Error while sending verification code. Contact support to request resend'
+            },
             undocumented: {
                 code: 12999,
                 path: 'account.verification.undocumented'

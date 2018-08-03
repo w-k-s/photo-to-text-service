@@ -9,23 +9,20 @@ const emailPort = parseInt(process.env.EMAILSERVICE_PORT);
 const emailSecure = process.env.EMAILSERVICE_SECURE === "true";
 const emailUser = process.env.EMAILSERVICE_USER;
 const emailPassword = process.env.EMAILSERVICE_PASS;
-const queue = "email";
+const queue = process.env.EMAIL_QUEUE_NAME;
 
 let conn;
 let channel;
 let transport;
 
 module.exports.start = async () => {
-	try{
-        await setupTransport();
+	await setupTransport();
 
-        conn = await amqp.connect(process.env.EMAIL_QUEUE_ADDRESS);
-        channel = await conn.createChannel();
-        channel.assertQueue(queue,{durable: false});
-        beginProcessing(channel);
-    }catch(e){
-        console.log(`emailSender:\tError starting queue: ${prettyJSON(e)}`);
-    }
+    console.log(`emailSender:\tConnecting to mq '${process.env.EMAIL_QUEUE_ADDRESS}'`);
+    conn = await amqp.connect(process.env.EMAIL_QUEUE_ADDRESS);
+    channel = await conn.createChannel();
+    channel.assertQueue(queue,{durable: false});
+    beginProcessing(channel);
 }
 
 const setupTransport = async () => {

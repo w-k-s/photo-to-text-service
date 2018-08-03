@@ -3,25 +3,27 @@ const amqp = require('amqplib');
 const nodemailer = require('nodemailer');
 
 const {logObj,prettyJSON} = require('./../utils');
+const ChannelClosedError = require('./error.js');
 
-const queue = 'email';
+const queue = process.env.EMAIL_QUEUE_NAME;
 
 let conn;
 let channel;
 
 const start = async () => {
-    try{
-        conn = await amqp.connect("amqp://localhost:5672");
-        channel = await conn.createChannel();
-        channel.assertQueue(queue,{durable: false});
-    }catch(e){
-        console.log(`emailQueuer:\tError starting queue: ${prettyJSON(e)}`);
-    }
+    console.log(`emailQueuer:\tConnecting to mq '${process.env.EMAIL_QUEUE_ADDRESS}'`);
+    conn = await amqp.connect(process.env.EMAIL_QUEUE_ADDRESS);
+    channel = await conn.createChannel();
+    channel.assertQueue(queue,{durable: false});
 }
 
 const sendEmail = async (mailOptions) => {
-    mailOptions.from = 'App Email <app@email.com>'
-    channel.sendToQueue(queue,Buffer.from(prettyJSON(mailOptions)));
+    try{
+        mailOptions.from = 'App Email <app@email.com>'
+        await channel.sendToQueue(queue,Buffer.from(prettyJSON(mailOptions)),{mandatory: true});
+    }catch(e){
+        throw new ChannelClosedError(e);
+    }
 }
 
 const close = async () => {

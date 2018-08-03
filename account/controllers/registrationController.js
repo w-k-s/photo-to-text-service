@@ -12,7 +12,7 @@ const {
 const {
     userService,
 } = require('./../services');
-const emailService = require('./../../services');
+const {emailService, ChannelClosedError} = require('./../../services');
 const {
     contentTypeJson
 } = require('./validation.js');
@@ -27,27 +27,30 @@ const {
     ReverifyingActiveAccountError
 } = require('./../errors');
 
+const error = domains.account;
+
 class RegistrationController {
 
     static async createUser(req, res) {
         const body = _.pick(req.body, ['email', 'password', 'firstName', 'lastName']);
         try {
             const user = await userService.createUser(body);
-            RegistrationController.sendVerificationEmail(req, user);
-
+            await RegistrationController.sendVerificationEmail(req, user);
             return res.status(201)
                     .send(new UserResponse(user))
                 
         } catch (e) {
             let status = 500;
-            let resp = new ErrorResponse(domains.account.registration.undocumented, e.message);
+            let resp = new ErrorResponse(error.registration.undocumented, e.message);
 
             if (e instanceof ValidationError) {
-                resp = new ErrorResponse(domains.account.registration.validation, undefined, e.fields)
+                resp = new ErrorResponse(error.registration.validation, undefined, e.fields)
                 status = 400;
             } else if (e instanceof DuplicateAccountError) {
-                resp = new ErrorResponse(domains.account.registration.duplicateAccount)
+                resp = new ErrorResponse(error.registration.duplicateAccount);
                 status = 400;
+            } else if (e instanceof ChannelClosedError){
+                resp = new ErrorResponse(error.verification.verificationCodeNotSent);
             }
 
             return res.status(status)
@@ -64,16 +67,16 @@ class RegistrationController {
         } catch (e) {
 
             let status = 500;
-            let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
+            let resp = new ErrorResponse(error.verification.undocumented, e.message)
 
             if (e instanceof TokenNotFoundError) {
-                resp = new ErrorResponse(domains.account.verification.tokenNotFound, e.message)
+                resp = new ErrorResponse(error.verification.tokenNotFound, e.message)
                 status = 404;
             } else if (e instanceof InvalidTokenError) {
-                resp = new ErrorResponse(domains.account.verification.tokenNotValid, e.message)
+                resp = new ErrorResponse(error.verification.tokenNotValid, e.message)
                 status = 400;
             } else if (e instanceof ReverifyingActiveAccountError) {
-                resp = new ErrorResponse(domains.account.verification.accountAlreadyActive, e.message)
+                resp = new ErrorResponse(error.verification.accountAlreadyActive, e.message)
                 status = 400;
             }
 
@@ -86,21 +89,23 @@ class RegistrationController {
         try {
             const resendRequest = new VerificationCodeRequest(req.body);
             const user = await userService.recreateVerificationCode(resendRequest);
-            RegistrationController.sendVerificationEmail(req, user);
+            await RegistrationController.sendVerificationEmail(req, user);
             return res.send(new UserResponse(user));
         } catch (e) {
             let status = 500;
-            let resp = new ErrorResponse(domains.account.verification.undocumented, e.message)
+            let resp = new ErrorResponse(error.verification.undocumented, e.message)
 
             if (e instanceof AccountNotFoundError) {
-                resp = new ErrorResponse(domains.account.verification.accountNotFound, e.message)
+                resp = new ErrorResponse(error.verification.accountNotFound, e.message)
                 status = 404;
             } else if (e instanceof ReverifyingActiveAccountError) {
-                resp = new ErrorResponse(domains.account.verification.accountAlreadyActive, e.message)
+                resp = new ErrorResponse(error.verification.accountAlreadyActive, e.message)
                 status = 400;
             } else if (e instanceof ValidationError) {
-                resp = new ErrorResponse(domains.account.verification.validation, undefined, e.fields)
+                resp = new ErrorResponse(error.verification.validation, undefined, e.fields)
                 status = 400;
+            } else if (e instanceof ChannelClosedError){
+                resp = new ErrorResponse(error.verification.verificationCodeNotSent);
             }
 
             return res.status(status)

@@ -14,7 +14,7 @@ const {
     HomeController
 } = require('./account/controllers');
 
-const emailService = require('./services');
+const {emailService} = require('./services');
 const authenticationRPCService = require('./account/services').authenticationService;
 
 let server;
@@ -51,25 +51,6 @@ const closeServer = async () => {
     emailService.close();
     await server.close();
 }
-
-function exitHandler(err) {
-
-    if(err){
-        console.log(`app:\tShutting down with error: ${err}`);
-    }
-
-    console.log('app:\tExiting...:');
-    closeServer();
-
-    console.log('app:\tExited');
-    process.exit();
-
-}
-
-process.on('SIGINT', exitHandler.bind(null));
-process.on('SIGUSR1', exitHandler.bind(null));
-process.on('SIGUSR2', exitHandler.bind(null));
-process.on('uncaughtException', exitHandler.bind(null));
 
 //-- Exports
 
