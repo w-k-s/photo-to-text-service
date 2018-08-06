@@ -11,8 +11,8 @@ let conn;
 let channel;
 
 const start = async () => {
-    console.log(`emailQueuer:\tConnecting to mq '${process.env.EMAIL_QUEUE_ADDRESS}'`);
-    conn = await amqp.connect(process.env.EMAIL_QUEUE_ADDRESS);
+    console.log(`emailQueuer:\tConnecting to mq '${process.env.MESSAGE_QUEUE_ADDRESS}'`);
+    conn = await amqp.connect(process.env.MESSAGE_QUEUE_ADDRESS);
     channel = await conn.createChannel();
     channel.assertQueue(queue,{durable: false});
 }

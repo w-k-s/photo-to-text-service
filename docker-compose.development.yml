@@ -1,0 +1,28 @@
+version: "3.1"
+
+services:
+  auth-service:
+    build: .
+    image: auth-service
+    container_name: auth-service
+    environment:
+      PORT: "3000"
+      NODE_ENV: "development"
+      MONGODB_URI: "mongodb://datastore:27017"
+      MESSAGE_QUEUE_ADDRESS: "amqp://mq:5672"
+    ports: 
+      - 3000:3000
+
+  datastore:
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - ~/data:/data/db
+
+  mq:
+    image: rabbitmq
+    ports:
+      - 5672:5672
+
+

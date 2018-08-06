@@ -18,8 +18,8 @@ let transport;
 module.exports.start = async () => {
 	await setupTransport();
 
-    console.log(`emailSender:\tConnecting to mq '${process.env.EMAIL_QUEUE_ADDRESS}'`);
-    conn = await amqp.connect(process.env.EMAIL_QUEUE_ADDRESS);
+    console.log(`emailSender:\tConnecting to mq '${process.env.MESSAGE_QUEUE_ADDRESS}'`);
+    conn = await amqp.connect(process.env.MESSAGE_QUEUE_ADDRESS);
     channel = await conn.createChannel();
     channel.assertQueue(queue,{durable: false});
     beginProcessing(channel);
