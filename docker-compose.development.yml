@@ -12,6 +12,12 @@ services:
       MESSAGE_QUEUE_ADDRESS: "amqp://mq:5672"
     ports: 
       - 3000:3000
+    links:
+      - datastore
+      - mq
+    depends_on:
+      - datastore
+      - mq
 
   datastore:
     image: mongo
