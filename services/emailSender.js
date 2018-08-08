@@ -10,6 +10,7 @@ const emailSecure = process.env.EMAILSERVICE_SECURE === "true";
 const emailUser = process.env.EMAILSERVICE_USER;
 const emailPassword = process.env.EMAILSERVICE_PASS;
 const queue = process.env.EMAIL_QUEUE_NAME;
+const sender = process.env.EMAILSERVICE_SENDER_ADDRESS;
 
 let conn;
 let channel;
@@ -55,7 +56,11 @@ const beginProcessing = (channel)=>{
             const content = msg.content.toString();
             console.log(`\n\n\n${prettyJSON(content)}\n\n\n`);
 			const mailOptions = JSON.parse(content);
-            await sendEmail(mailOptions);
+            try{
+                await sendEmail(mailOptions);
+            }catch(e){
+                console.log(`emailSender:\tFailed to send msg:\nmsg: ${msg}\noptions: ${prettyJSON(mailOptions)}\nerr: ${prettyJSON(e)}`);
+            }
 		}, {noAck: true});
 	}catch(e){
 		console.log(`emailSender:\tError processing queue: ${prettyJSON(e)}`);
@@ -63,7 +68,7 @@ const beginProcessing = (channel)=>{
 }
 
 const sendEmail = async (mailOptions) => {
-    mailOptions.from = 'App Email <app@email.com>'
+    mailOptions.from = sender;
     const info = await transport.sendMail(mailOptions)
     if (process.env.NODE_ENV !== "production") {
         console.log(`emailSender:\tpreview: ${nodemailer.getTestMessageUrl(info)}`)

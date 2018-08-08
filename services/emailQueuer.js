@@ -19,7 +19,6 @@ const start = async () => {
 
 const sendEmail = async (mailOptions) => {
     try{
-        mailOptions.from = 'App Email <app@email.com>'
         await channel.sendToQueue(queue,Buffer.from(prettyJSON(mailOptions)),{mandatory: true});
     }catch(e){
         throw new ChannelClosedError(e);
