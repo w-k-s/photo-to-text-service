@@ -25,7 +25,6 @@ const mongoDuplicateKeyErrorCode = 11000;
 
 const saveUser = async (user) => {
     const res = await insertUser(user);
-    await indexUsers();
     return res;
 }
 
@@ -45,6 +44,7 @@ const insertUser = async (user) => {
     obj._id = ObjectId(user._id);
     try {
         const res = await getUsersCollection().insert(obj);
+        await index();
         return user;
     } catch (err) {
         if (err.code == mongoDuplicateKeyErrorCode) {
@@ -82,9 +82,10 @@ const updateUser = async (user) => {
     }
 }
 
-const indexUsers = async () => {
+const index = async () => {
     await getUsersCollection().createIndex({
-        'email': 1
+        'email': 1,
+        'tokens.token':1,
     }, {
         unique: true
     });
@@ -155,7 +156,7 @@ const removeToken = async(access, token) => {
             returnOriginal: false
         }
     );
-
+    await index();
     const obj = doc.value;
     if (!obj) {
         return null;
