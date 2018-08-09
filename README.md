@@ -37,7 +37,94 @@
 
 - [ ] returns user
 
-### 3. Todo
+### 3. Deployment Steps
+
+Not all steps may be necessary.
+
+1. Run Tests
+
+2. Update version in `.env` file.
+
+3. Make a docker build using the make file command:
+
+```
+make docker-build
+```
+
+4. Publish docker image to DockerHub.
+
+```
+make docker-push
+```
+
+5. Copy the new `.env` file to ec2
+
+```
+scp -i  path/to/key .env ec2-user@ec2-xx-xx-xxx-xxx.compute-1.amazonaws.com:path/to/file
+```
+
+6. If there are change to the `docker-compose.production.yml` file or it does not exist on ec2, copy the file to ec2.
+
+```
+scp -i  path/to/key docker-compose.production.yml ec2-user@ec2-xx-xx-xxx-xxx.compute-1.amazonaws.com:path/to/file
+```
+
+7. If there are changes to the `Makefile` or it does not exist on ec2, copy the file to ec2
+
+```
+scp -i  path/to/key Makefile ec2-user@ec2-xx-xx-xxx-xxx.compute-1.amazonaws.com:path/to/file
+```
+
+8. Connect to ec2 instance
+
+```
+ssh -i path/to/key ec2-user@ec2-xx-xx-xxx-xxx.compute-1.amazonaws.com:path/to/file
+```
+
+9. Ensure that docker is installed (`docker -v`)
+
+```
+#Update the installed packages and package cache on your instance.
+
+sudo yum update -y
+
+#Install the most recent Docker Community Edition package.
+
+sudo yum install -y docker
+
+#Start the Docker service.
+
+sudo service docker start
+
+#Add the ec2-user to the docker group so you can execute Docker commands without using sudo.
+
+sudo usermod -a -G docker ec2-user
+```
+
+Log out and log back in again to pick up the new docker group permissions. You can accomplish this by closing your current SSH terminal window and reconnecting to your instance in a new one. Your new SSH session will have the appropriate docker group permissions.
+
+
+10. Ensure that docker-compose is installed (`docker-compose -v`)
+
+```
+#Run this command to download a given version of Docker Compose:
+
+sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+
+
+#Apply executable permissions to the binary:
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+```
+
+11. Run docker container using make file
+
+```
+make docker-start-prod
+```
+
+### 4. Todo
 
 - [x] Encrypt password
 - [x] Helpful password error mesaage
