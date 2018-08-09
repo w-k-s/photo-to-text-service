@@ -10,6 +10,16 @@ services:
       NODE_ENV: "development"
       MONGODB_URI: "mongodb://datastore:27017"
       MESSAGE_QUEUE_ADDRESS: "amqp://mq:5672"
+      MONGODB_NAME: "users",
+      JWT_SECRET: "secret"
+      SALT_ROUNDS: "10"
+      EMAILSERVICE_HOST: "smtp.ethereal.email"
+      EMAILSERVICE_PORT: "587"
+      EMAILSERVICE_SECURE: "false"
+      EMAILSERVICE_USER: "null"
+      EMAILSERVICE_PASS: "null"
+      EMAILSERVICE_SENDER_ADDRESS: "App Email <app@email.com>"
+
     ports: 
       - 3000:3000
     links:

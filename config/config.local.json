@@ -1,8 +1,8 @@
 {
     "PORT": 3000,
     "MONGODB_URI": "mongodb://localhost:27017",
-    "MONGODB_NAME": "users_test",
-    "JWT_SECRET": "secret",
+    "MONGODB_NAME": "users",
+    "JWT_SECRET": "4226AB81B242D81A287EC4AEE1563",
     "AUTH_EXP_SECONDS": 3600,
     "EMAIL_VERIFICATION_EXP_SECONDS": 432000,
     "SALT_ROUNDS": 10,
