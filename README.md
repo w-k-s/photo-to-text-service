@@ -5,7 +5,6 @@
 
 - [x] Use Message Queues 
 - [x] Use gRPC
-- [ ] Hosting microservice for as little as possible
 
 ### 2. Routes
 
@@ -49,6 +48,13 @@
 - [x] Logout
 - [ ] Localize
 - [x] Message Queues
+- [x] Setup and connect to production database
+- [x] Setup and integrate production email
+- [ ] after verification, return no content or return javascript that closes the window.
+- [ ] Setting up ec2 instance with rabbitmq.
+- [ ] hosting project with ec2 instance.
+- [ ] domain name? 
+- [ ] Move email service out of sandbox by sending request, submitting limits
 
 ### 3. References
 

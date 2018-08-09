@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const _ = require('lodash');
+var path    = require("path");
 const {
     logObj
 } = require('./../../utils');
@@ -63,7 +64,7 @@ class RegistrationController {
         try {
             const verificationToken = req.params.token;
             const user = await userService.verifyUser(verificationToken);
-            return res.send(new UserResponse(user));
+            return res.sendFile(path.join(__dirname+'/templates/verified.html'));
         } catch (e) {
 
             let status = 500;
