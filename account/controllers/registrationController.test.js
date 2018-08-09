@@ -23,12 +23,6 @@ const {
 
 describe('RegistrationController', () => {
 
-    before((done) => {
-        initServer()
-            .then(() => done())
-            .catch((e) => done(e));
-    });
-
     describe('createUser', () => {
 
         let body;
@@ -150,6 +144,7 @@ describe('RegistrationController', () => {
                 .set('content-type', 'application/json')
                 .send(body)
                 .expect(201, (err, resp) => {
+                    logObj('log',{err,resp});
                     const user = JSON.parse(resp.text);
                     expect(user._id).toBeTruthy();
                     expect(user.firstName).toEqual(body.firstName);
