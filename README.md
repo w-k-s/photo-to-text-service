@@ -84,19 +84,19 @@ ssh -i path/to/key ec2-user@ec2-xx-xx-xxx-xxx.compute-1.amazonaws.com:path/to/fi
 9. Ensure that docker is installed (`docker -v`)
 
 ```
-#Update the installed packages and package cache on your instance.
+# Update the installed packages and package cache on your instance.
 
 sudo yum update -y
 
-#Install the most recent Docker Community Edition package.
+# Install the most recent Docker Community Edition package.
 
 sudo yum install -y docker
 
-#Start the Docker service.
+# Start the Docker service.
 
 sudo service docker start
 
-#Add the ec2-user to the docker group so you can execute Docker commands without using sudo.
+# Add the ec2-user to the docker group so you can execute Docker commands without using sudo.
 
 sudo usermod -a -G docker ec2-user
 ```
@@ -107,12 +107,12 @@ Log out and log back in again to pick up the new docker group permissions. You c
 10. Ensure that docker-compose is installed (`docker-compose -v`)
 
 ```
-#Run this command to download a given version of Docker Compose:
+# Run this command to download a given version of Docker Compose:
 
 sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 
 
-#Apply executable permissions to the binary:
+# Apply executable permissions to the binary:
 
 sudo chmod +x /usr/local/bin/docker-compose
 
@@ -143,7 +143,7 @@ make docker-start-prod
 - [ ] domain name? 
 - [ ] Move email service out of sandbox by sending request, submitting limits
 
-### 3. References
+### 5. References
 
 - [How to use arguments and parameters in ecmascript](https://www.smashingmagazine.com/2016/07/how-to-use-arguments-and-parameters-in-ecmascript-6/)
 - [Implementing remote procedure calls with gRPC and protocol buffers](https://scotch.io/tutorials/implementing-remote-procedure-calls-with-grpc-and-protocol-buffers)
