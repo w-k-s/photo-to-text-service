@@ -23,6 +23,12 @@ const {
 
 describe('RegistrationController', () => {
 
+    before((done) => {
+        initServer()
+            .then(() => done())
+            .catch((e) => done(e));
+    });
+
     describe('createUser', () => {
 
         let body;
@@ -144,7 +150,6 @@ describe('RegistrationController', () => {
                 .set('content-type', 'application/json')
                 .send(body)
                 .expect(201, (err, resp) => {
-                    logObj('log',{err,resp});
                     const user = JSON.parse(resp.text);
                     expect(user._id).toBeTruthy();
                     expect(user.firstName).toEqual(body.firstName);
@@ -264,15 +269,7 @@ describe('RegistrationController', () => {
                 .set('content-type', 'application/json')
                 .send(body)
                 .expect(200, (err, resp) => {
-                    const user = JSON.parse(resp.text);
-                    expect(user._id).toBeTruthy();
-                    expect(user.firstName).toEqual(body.firstName);
-                    expect(user.lastName).toEqual(body.lastName);
-                    expect(user.email).toEqual(body.email);
-                    expect(resp.password).toBeFalsy();
-                    expect(user.isActive).toBeTruthy();
-                    expect(user.isStaff).toBeFalsy();
-                    expect(resp.tokens).toBeFalsy();
+                    expect(resp.header['content-type']).toEqual("text/html; charset=UTF-8");
                     done();
                 });
         });
