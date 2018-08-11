@@ -1,0 +1,196 @@
+swagger: "2.0"
+info:
+  description: "An authorization microservice that I intend to use for all of my future web projects."
+  version: "1.0.0"
+  title: "Authorization Microservice"
+  contact:
+    name: "w-k-s"
+    url: "http://www.github.com/w-k-s"
+    email: "development.asfour@gmail.com"
+  license:
+    name: "Mozilla Public License 2.0"
+    url: "https://tldrlegal.com/license/mozilla-public-license-2.0-(mpl-2)#fulltext"
+basePath: "/"
+tags:
+- name: "register"
+  description: "Register new account"
+- name: "verify"
+  description: "Verify registered account"
+- name: "login"
+  description: "Sign-in using verified account"
+- name: "logout"
+  description: "Sign-out using verified account"
+schemes:
+- "http"
+paths:
+  /users:
+    post:
+      tags:
+      - "register"
+      summary: "Create user"
+      description: "Create a new user"
+      operationId: "createUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "user"
+        description: "User object"
+        required: true
+        schema:
+          $ref: "#/definitions/UserRequest"
+      responses:
+        201:
+          description: "User created"
+          schema:
+            $ref: "#/definitions/UserResponse"
+        400:
+          description: "Validation error or account already exists"
+  /users/verify/{token}:
+    get:
+      tags:
+      - "verify"
+      summary: "Verifies email address using verification code"
+      description: "Once a user has registered successfully, a link to this endpoint is emailed to the user with a verification token. Clicking on the link verifies and activates the account. Verification token will be invalidated in both success and failure cases."
+      operationId: "sendVerificationCode"
+      produces:
+      - "text/html"
+      - "application/json"
+      parameters:
+      - name: "token"
+        in: "path"
+        description: "Valid JWT Verification token"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Token verified"
+          schema:
+            $ref: "#/definitions/UserResponse"
+        404:
+          description: "Token not found"
+        400:
+          description: "Token invalid or account already active"
+  /users/resendVerificationCode:
+    post:
+      tags:
+      - "verify"
+      summary: "Resends verification code"
+      description: "Resends verification code to registered email address"
+      operationId: "resendVerificationCode"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "email"
+        in: "body"
+        description: "Email address account was registered with"
+        required: true
+        schema:
+          $ref: "#/definitions/ResendRequest"
+      responses:
+        200:
+          description: "Verification email queued"
+          schema:
+            $ref: "#/definitions/UserResponse"
+        404:
+          description: "Account with email not found"
+        400:
+          description: "Validation error or account already active"
+        500:
+          description: "Verification email failed to queue."
+  /users/login:
+    post:
+      tags:
+      - "login"
+      summary: "Logs in user"
+      description: "Logs in user. Sets authorization header"
+      operationId: "login"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "credentials"
+        in: "body"
+        description: "Login credentials"
+        required: true
+        schema:
+          $ref: "#/definitions/LoginRequest"
+      responses:
+        200:
+          description: "successful operation"
+          headers:
+            Authorization:
+              type: "string"
+              description: "JWT Authorization token"
+          schema:
+            $ref: "#/definitions/UserResponse"
+        400:
+          description: "Validation error"
+        401: 
+          description: "Invalid credentials or account not active"
+        404:
+          description: "Account not found"
+  /users/logout:
+    post:
+      tags:
+      - "logout"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logoutUser"
+      parameters: 
+        - name: "Authorization"
+          in: "header"
+          required: true
+          description: "JWT Authorization token"
+          type: "string"
+      responses:
+        204:
+          description: "Logout successful"
+        500:
+          description: "Undocumented error"
+definitions:
+  UserRequest:
+    type: "object"
+    required:
+      - "firstName"
+      - "lastName"
+      - "email"
+      - "password"
+    properties:
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+  LoginRequest:
+    type: "object"
+    required:
+      - "email"
+      - "password"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+  UserResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      email:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      isActive:
+        type: "boolean"
+      isStaff:
+        type: "boolean"
+  ResendRequest:
+    type: "object"
+    properties:
+      email:
+        type: "string"

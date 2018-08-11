@@ -3,7 +3,7 @@
 class HomeController {
 
     static home(req, res) {
-        return res.send(`User API`);
+        return res.redirect('/docs');
     }
 }
 

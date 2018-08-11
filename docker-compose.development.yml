@@ -9,7 +9,7 @@ services:
       PORT: "3000"
       NODE_ENV: "development"
       MONGODB_URI: "mongodb://datastore:27017"
-      MESSAGE_QUEUE_ADDRESS: "amqp://mq:5672"
+      MESSAGE_QUEUE_ADDRESS: "amqp://rabbitmq:5672"
       MONGODB_NAME: "users"
       JWT_SECRET: "secret"
       SALT_ROUNDS: "10"
@@ -19,25 +19,33 @@ services:
       EMAILSERVICE_USER: "null"
       EMAILSERVICE_PASS: "null"
       EMAILSERVICE_SENDER_ADDRESS: "App Email <app@email.com>"
-
     ports: 
       - 3000:3000
     links:
       - datastore
-      - mq
+      - waitforrabbit
     depends_on:
       - datastore
-      - mq
+      - waitforrabbit
 
   datastore:
     image: mongo
+    container_name: mongo
     ports:
       - 27017:27017
     volumes:
       - ~/data:/data/db
 
-  mq:
+  waitforrabbit:
+    image: dadarek/wait-for-dependencies
+    container_name: waitforrabbit
+    depends_on:
+      - rabbitmq 
+    command: rabbitmq:5672
+
+  rabbitmq:
     image: rabbitmq
+    container_name: rabbitmq
     ports:
       - 5672:5672
 

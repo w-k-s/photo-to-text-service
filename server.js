@@ -1,4 +1,5 @@
 require('./config/config.js')
+const path = require('path');
 const express = require('express');
 
 const {
@@ -19,8 +20,9 @@ const authenticationRPCService = require('./account/services').authenticationSer
 
 let server;
 const app = express();
-app.use(express.json());
 
+app.use(express.json());
+app.use('/docs',express.static(path.join(__dirname, 'public')));
 //-- Set routes
 
 const authenticate = LoginController.authenticate;

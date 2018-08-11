@@ -54,7 +54,7 @@ make docker-build
 4. Publish docker image to DockerHub.
 
 ```
-make docker-push
+make docker-publish
 ```
 
 5. Copy the new `.env` file to ec2
@@ -137,9 +137,11 @@ make docker-start-prod
 - [x] Message Queues
 - [x] Setup and connect to production database
 - [x] Setup and integrate production email
-- [ ] after verification, return no content or return javascript that closes the window.
-- [ ] Setting up ec2 instance with rabbitmq.
-- [ ] hosting project with ec2 instance.
+- [x] after verification, return no content or return javascript that closes the window.
+- [x] Setting up ec2 instance with rabbitmq.
+- [x] hosting project with ec2 instance.
+- [x] wait for it for rabbitmq
+- [x] document rest api and render on home page
 - [ ] domain name? 
 - [ ] Move email service out of sandbox by sending request, submitting limits
 
@@ -147,3 +149,5 @@ make docker-start-prod
 
 - [How to use arguments and parameters in ecmascript](https://www.smashingmagazine.com/2016/07/how-to-use-arguments-and-parameters-in-ecmascript-6/)
 - [Implementing remote procedure calls with gRPC and protocol buffers](https://scotch.io/tutorials/implementing-remote-procedure-calls-with-grpc-and-protocol-buffers)
+- [Waiting for docker dependencies using `dadarek/wait-for-dependencies`](https://stackoverflow.com/questions/48015477/docker-and-rabbitmq-econnrefused-between-containers)
+- [Setting up Swagger UI](https://idratherbewriting.com/learnapidoc/pubapis_swagger.html#swagger-ui-overview)
