@@ -1,6 +1,7 @@
 require('./config/config.js')
 const path = require('path');
 const express = require('express');
+const account = require('./account');
 
 const {
     initDb,
@@ -40,6 +41,8 @@ const initServer = async () => {
     await initDb();
     await emailService.start();
     authenticationRPCService.start();
+    await account.setup();
+    
     server = require('http').createServer(app);
     app.listen(process.env.PORT,()=>{
         console.log(`app:\tServer running at: ${process.env.PORT}`);
