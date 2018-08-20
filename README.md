@@ -1,7 +1,7 @@
 # Photo to Text
 ## The Authentication Microservice
 
-Try the service: [www.small.ml/bob](www.small.ml/bob)
+Try the service: [www.small.ml/bob](https://www.small.ml/bob)
 
 ### 1. Project Goals
 
