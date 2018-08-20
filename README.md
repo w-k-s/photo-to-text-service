@@ -1,6 +1,8 @@
 # Photo to Text
 ## The Authentication Microservice
 
+Try the service: [www.small.ml/bob]
+
 ### 1. Project Goals
 
 - [x] Use Message Queues 
